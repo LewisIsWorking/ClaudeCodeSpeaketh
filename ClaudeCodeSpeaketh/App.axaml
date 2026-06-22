@@ -1,0 +1,11 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ClaudeCodeSpeaketh.App"
+             RequestedThemeVariant="Dark">
+
+    <!-- Fluent theme + slot for Inter font (registered in Program.cs via .WithInterFont()) -->
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+
+</Application>

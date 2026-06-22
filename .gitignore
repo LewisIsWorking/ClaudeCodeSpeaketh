@@ -1,0 +1,18 @@
+# .NET / build output
+bin/
+obj/
+*.user
+*.suo
+
+# Rider / VS
+.idea/
+.vs/
+*.DotSettings.user
+
+# Velopack / publish artifacts (when added later)
+publish/
+Releases/
+
+# OS cruft
+Thumbs.db
+.DS_Store
