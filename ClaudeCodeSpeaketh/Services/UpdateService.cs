@@ -6,21 +6,18 @@ using Velopack.Sources;
 
 namespace ClaudeCodeSpeaketh.Services;
 
-// Wraps Velopack's UpdateManager. Today it reads from a LOCAL folder feed (the
-// repo's Releases dir) so updates work + are testable on this machine with no
-// hosting. Swap DefaultFeed to a GithubSource / URL for real distribution.
+// Wraps Velopack's UpdateManager, reading releases from the public GitHub repo
+// (tokenless GithubSource). `vpk upload github` publishes each version there.
 [SupportedOSPlatform("windows")]
 internal sealed class UpdateService
 {
-    // Local feed for now. To ship: replace with e.g.
-    //   new UpdateManager(new GithubSource("https://github.com/LewisIsWorking/ClaudeCodeSpeaketh", null, false))
-    public const string DefaultFeed =
-        @"C:\Users\Lewis\RiderProjects\ClaudeCodeSpeaketh\Releases";
+    public const string RepoUrl = "https://github.com/LewisIsWorking/ClaudeCodeSpeaketh";
 
     private readonly UpdateManager _mgr;
 
-    public UpdateService(string? feed = null)
-        => _mgr = new UpdateManager(feed ?? DefaultFeed);
+    // accessToken null = public repo; prerelease false.
+    public UpdateService()
+        => _mgr = new UpdateManager(new GithubSource(RepoUrl, null, false));
 
     /// <summary>True only when running as a Velopack-installed app (not a dev build).</summary>
     public bool IsInstalled => _mgr.IsInstalled;
