@@ -17,6 +17,7 @@ internal partial class MainWindowViewModel : ObservableObject
     private TtsConfig _model;
 
     public GeneralViewModel General { get; }
+    public NeuralViewModel Neural { get; }
     public SapiVoiceViewModel Sapi { get; }
     public VoiceManagementViewModel Voices { get; }
     public UpdateViewModel Update { get; }
@@ -32,6 +33,7 @@ internal partial class MainWindowViewModel : ObservableObject
         General = new GeneralViewModel();
         var preview = new VoicePreviewService();
         Sapi = new SapiVoiceViewModel(new SapiVoiceService(), preview, General);
+        Neural = new NeuralViewModel(new EdgeTtsService(_config.HooksDir));
 
         // After installing the Irish pack, re-enumerate so Orla shows in the picker.
         Voices = new VoiceManagementViewModel(
@@ -41,6 +43,7 @@ internal partial class MainWindowViewModel : ObservableObject
 
         General.LoadFrom(_model);
         Sapi.LoadFrom(_model);
+        Neural.LoadFrom(_model);
     }
 
     [RelayCommand]
@@ -50,6 +53,7 @@ internal partial class MainWindowViewModel : ObservableObject
         {
             General.ApplyTo(_model);
             Sapi.ApplyTo(_model);
+            Neural.ApplyTo(_model);
             _config.Save(_model);
 
             var written = _deploy.DeployAll();

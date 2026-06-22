@@ -9,6 +9,9 @@ internal partial class GeneralViewModel : ObservableObject
 {
     [ObservableProperty] private bool _enabled = true;
 
+    // Engine: true = Neural (edge-tts), false = Classic (SAPI). Neural is default.
+    [ObservableProperty] private bool _useNeural = true;
+
     // "Speak entire response" == maxChars <= 0. When unchecked, MaxCharsValue applies.
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MaxCharsEnabled))]
@@ -23,6 +26,7 @@ internal partial class GeneralViewModel : ObservableObject
     public void LoadFrom(TtsConfig cfg)
     {
         Enabled = cfg.Enabled;
+        UseNeural = cfg.Engine != "sapi";
         SpeakEntireResponse = cfg.MaxChars <= 0;
         MaxCharsValue = cfg.MaxChars > 0 ? cfg.MaxChars : 1500;
         Rate = cfg.Sapi.Rate;
@@ -32,6 +36,7 @@ internal partial class GeneralViewModel : ObservableObject
     public void ApplyTo(TtsConfig cfg)
     {
         cfg.Enabled = Enabled;
+        cfg.Engine = UseNeural ? "edge" : "sapi";
         cfg.MaxChars = SpeakEntireResponse ? 0 : MaxCharsValue;
         cfg.Sapi.Rate = Rate;
         cfg.Sapi.Volume = Volume;

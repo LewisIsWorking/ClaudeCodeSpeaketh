@@ -16,6 +16,7 @@ internal sealed class HookScriptDeployService
         "tts-config.ps1",
         "speak-response.ps1",
         "tts-speaker.ps1",
+        "tts-edge.ps1",
     };
 
     private readonly string _hooksDir;

@@ -28,14 +28,11 @@ function Get-TtsConfig {
     # 0 (= ALL / speak the entire response) per the product decision.
     $cfg = @{
         Enabled        = $true
-        Engine         = 'sapi'
+        Engine         = 'edge'                  # neural by default (free Irish Emily)
         SapiVoice      = 'Microsoft Hazel Desktop'
+        EdgeVoice      = 'en-IE-EmilyNeural'
         Rate           = 0
         Volume         = 100
-        PiperExe       = ''
-        PiperModel     = ''
-        PiperLengthScale = 1.0
-        PiperUseCuda   = $true
         MaxChars       = 0
         StripMarkdown  = $true
     }

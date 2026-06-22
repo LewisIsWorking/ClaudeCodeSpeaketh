@@ -39,6 +39,16 @@
                                       OnContent="On" OffContent="Off" />
                     </StackPanel>
 
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Engine" FontWeight="SemiBold" />
+                        <RadioButton GroupName="engine"
+                                     Content="Neural — Emily etc. (edge-tts): natural, free, needs internet"
+                                     IsChecked="{Binding General.UseNeural}" />
+                        <RadioButton GroupName="engine"
+                                     Content="Classic (SAPI): robotic, but fully offline"
+                                     IsChecked="{Binding !General.UseNeural}" />
+                    </StackPanel>
+
                     <StackPanel Spacing="6">
                         <TextBlock Text="How much to read per turn" FontWeight="SemiBold" />
                         <CheckBox IsChecked="{Binding General.SpeakEntireResponse}"
@@ -64,6 +74,40 @@
                         <Slider Value="{Binding General.Volume}" Minimum="0" Maximum="100"
                                 TickFrequency="10" Width="360" HorizontalAlignment="Left" />
                     </StackPanel>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Neural (edge-tts) -->
+            <TabItem Header="Neural (Emily)">
+                <StackPanel Margin="6,12" Spacing="14" MaxWidth="560" HorizontalAlignment="Left">
+                    <TextBlock Text="Free neural voices via edge-tts (Microsoft Edge). Includes the Irish female voice Emily. Needs Python + internet."
+                               Opacity="0.7" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Install neural voices"
+                                Command="{Binding Neural.InstallCommand}"
+                                IsEnabled="{Binding !Neural.IsBusy}"
+                                IsVisible="{Binding !Neural.IsAvailable}"
+                                Background="#3aa55d" Foreground="White" Padding="12,8" />
+                        <Button Content="↻ Refresh"
+                                Command="{Binding Neural.RefreshCommand}"
+                                IsEnabled="{Binding !Neural.IsBusy}" Padding="12,8" />
+                    </StackPanel>
+                    <ComboBox ItemsSource="{Binding Neural.Voices}"
+                              SelectedItem="{Binding Neural.SelectedVoice, Mode=TwoWay}"
+                              IsEnabled="{Binding Neural.IsAvailable}"
+                              Width="520" HorizontalAlignment="Left">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="m:EdgeVoiceInfo">
+                                <TextBlock Text="{Binding Display}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button Content="▶ Preview"
+                            Command="{Binding Neural.PreviewCommand}"
+                            IsEnabled="{Binding Neural.IsAvailable}" />
+                    <ProgressBar IsIndeterminate="True" IsVisible="{Binding Neural.IsBusy}"
+                                 Height="6" HorizontalAlignment="Stretch" />
+                    <TextBlock Text="{Binding Neural.Status}" FontSize="12" Opacity="0.75" TextWrapping="Wrap" />
                 </StackPanel>
             </TabItem>
 

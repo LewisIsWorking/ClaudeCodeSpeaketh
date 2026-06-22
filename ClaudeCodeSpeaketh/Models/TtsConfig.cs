@@ -9,11 +9,11 @@ internal sealed class TtsConfig
     /// <summary>Master on/off for spoken responses.</summary>
     public bool Enabled { get; set; } = true;
 
-    /// <summary>"sapi" or "piper" -- the default engine.</summary>
-    public string Engine { get; set; } = "sapi";
+    /// <summary>"edge" (neural, default) or "sapi" (classic, offline).</summary>
+    public string Engine { get; set; } = "edge";
 
     public SapiSettings Sapi { get; set; } = new();
-    public PiperSettings Piper { get; set; } = new();
+    public EdgeSettings Edge { get; set; } = new();
 
     /// <summary>0 (or negative) = ALL: speak the entire response. &gt;0 = cap.</summary>
     public int MaxChars { get; set; }
@@ -31,11 +31,8 @@ internal sealed class SapiSettings
     public int Volume { get; set; } = 100; // 0..100
 }
 
-internal sealed class PiperSettings
+internal sealed class EdgeSettings
 {
-    public string ExePath { get; set; } = "";
-    public string ModelPath { get; set; } = "";
-    public string ModelKey { get; set; } = "";
-    public double LengthScale { get; set; } = 1.0;
-    public bool UseCuda { get; set; } = true;
+    // Default fresh-install voice: free female Irish English neural voice.
+    public string Voice { get; set; } = "en-IE-EmilyNeural";
 }

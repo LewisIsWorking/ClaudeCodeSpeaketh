@@ -18,15 +18,12 @@ try {
     $text = Get-Content -LiteralPath $textFile -Raw -Encoding UTF8
     if ([string]::IsNullOrWhiteSpace($text)) { return }
 
-    # --- Piper route (neural). Falls back to SAPI if unavailable. -------------
-    $piperScript = Join-Path $PSScriptRoot 'tts-piper.ps1'
-    $usePiper = ($cfg.Engine -eq 'piper') -and
-                (Test-Path -LiteralPath $piperScript) -and
-                $cfg.PiperExe -and (Test-Path -LiteralPath $cfg.PiperExe) -and
-                $cfg.PiperModel -and (Test-Path -LiteralPath $cfg.PiperModel)
-    if ($usePiper) {
-        . $piperScript
-        if (Invoke-PiperSpeak -Text $text -Config $cfg) { return }
+    # --- Edge neural route. Falls back to SAPI if it fails (no python/net). ---
+    $edgeScript = Join-Path $PSScriptRoot 'tts-edge.ps1'
+    if ($cfg.Engine -eq 'edge' -and (Test-Path -LiteralPath $edgeScript)) {
+        . $edgeScript   # dot-source with no args only defines Invoke-EdgeSpeak
+        $rate = ('{0:+0;-0;+0}' -f ([int]$cfg.Rate * 10)) + '%'
+        if (Invoke-EdgeSpeak -TextFile $textFile -Voice $cfg.EdgeVoice -Rate $rate) { return }
         # else fall through to SAPI
     }
 
