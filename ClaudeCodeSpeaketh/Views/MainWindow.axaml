@@ -67,7 +67,7 @@
                     <TextBlock Text="Pick the Windows voice the hook speaks with."
                                Opacity="0.7" />
                     <ComboBox ItemsSource="{Binding Sapi.Voices}"
-                              SelectedItem="{Binding Sapi.SelectedVoice}"
+                              SelectedItem="{Binding Sapi.SelectedVoice, Mode=TwoWay}"
                               Width="520" HorizontalAlignment="Left">
                         <ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="m:SapiVoiceInfo">
@@ -79,7 +79,7 @@
                         <Button Content="▶ Preview" Command="{Binding Sapi.PreviewCommand}" />
                         <Button Content="■ Stop" Command="{Binding Sapi.StopPreviewCommand}" />
                     </StackPanel>
-                    <TextBlock Text="Tip: en-GB voices (Hazel/Susan) are British. To add the Irish 'Orla' voice, use the Get Voices tab."
+                    <TextBlock Text="Picking a voice auditions it immediately. en-GB voices (Hazel/Susan) are British; add the Irish 'Orla' voice from the Get Voices tab."
                                FontSize="11" Opacity="0.5" TextWrapping="Wrap" />
                 </StackPanel>
             </TabItem>
@@ -99,6 +99,8 @@
                                 Command="{Binding Voices.RefreshVoicesCommand}"
                                 IsEnabled="{Binding !Voices.IsBusy}" Padding="12,8" />
                     </StackPanel>
+                    <ProgressBar IsIndeterminate="True" IsVisible="{Binding Voices.IsBusy}"
+                                 Height="6" HorizontalAlignment="Stretch" />
                     <TextBlock Text="{Binding Voices.Status}" FontSize="12" Opacity="0.75" TextWrapping="Wrap" />
                 </StackPanel>
             </TabItem>

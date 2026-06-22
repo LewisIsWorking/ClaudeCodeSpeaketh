@@ -21,6 +21,9 @@ internal partial class SapiVoiceViewModel : ObservableObject
 
     [ObservableProperty] private SapiVoiceInfo? _selectedVoice;
 
+    // Suppresses auto-preview while LoadFrom sets the initial selection.
+    private bool _loading;
+
     public SapiVoiceViewModel(SapiVoiceService voices, VoicePreviewService preview, GeneralViewModel general)
     {
         _voices = voices;
@@ -30,10 +33,19 @@ internal partial class SapiVoiceViewModel : ObservableObject
 
     public void LoadFrom(TtsConfig cfg)
     {
+        _loading = true;
         Voices.Clear();
         foreach (var v in _voices.GetInstalledVoices()) Voices.Add(v);
         SelectedVoice = Voices.FirstOrDefault(v => v.Name == cfg.Sapi.Voice)
                         ?? Voices.FirstOrDefault();
+        _loading = false;
+    }
+
+    // Auto-audition the voice the moment the user picks a different one.
+    partial void OnSelectedVoiceChanged(SapiVoiceInfo? value)
+    {
+        if (_loading || value is null) return;
+        _preview.PreviewSapi(value.Name, _general.Rate, _general.Volume);
     }
 
     public void ApplyTo(TtsConfig cfg)
