@@ -79,8 +79,27 @@
                         <Button Content="▶ Preview" Command="{Binding Sapi.PreviewCommand}" />
                         <Button Content="■ Stop" Command="{Binding Sapi.StopPreviewCommand}" />
                     </StackPanel>
-                    <TextBlock Text="Tip: en-GB voices (Hazel/Susan) are British; the Irish 'Orla' voice arrives in a later update."
+                    <TextBlock Text="Tip: en-GB voices (Hazel/Susan) are British. To add the Irish 'Orla' voice, use the Get Voices tab."
                                FontSize="11" Opacity="0.5" TextWrapping="Wrap" />
+                </StackPanel>
+            </TabItem>
+
+            <!-- Get Voices -->
+            <TabItem Header="Get Voices">
+                <StackPanel Margin="6,12" Spacing="14" MaxWidth="600" HorizontalAlignment="Left">
+                    <TextBlock Text="Irish English voice (Orla)" FontWeight="SemiBold" />
+                    <TextBlock Text="Installs the Windows en-IE text-to-speech voice as a Feature on Demand. Needs admin (one UAC prompt) and a download. Once installed it appears in the SAPI Voices tab automatically."
+                               FontSize="12" Opacity="0.7" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Get Irish voice (Orla)"
+                                Command="{Binding Voices.InstallIrishCommand}"
+                                IsEnabled="{Binding !Voices.IsBusy}"
+                                Background="#3aa55d" Foreground="White" Padding="14,8" />
+                        <Button Content="↻ Refresh voices"
+                                Command="{Binding Voices.RefreshVoicesCommand}"
+                                IsEnabled="{Binding !Voices.IsBusy}" Padding="12,8" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding Voices.Status}" FontSize="12" Opacity="0.75" TextWrapping="Wrap" />
                 </StackPanel>
             </TabItem>
 

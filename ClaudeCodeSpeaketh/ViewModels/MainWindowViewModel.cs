@@ -18,6 +18,7 @@ internal partial class MainWindowViewModel : ObservableObject
 
     public GeneralViewModel General { get; }
     public SapiVoiceViewModel Sapi { get; }
+    public VoiceManagementViewModel Voices { get; }
 
     [ObservableProperty] private string _status = "Ready.";
 
@@ -30,6 +31,10 @@ internal partial class MainWindowViewModel : ObservableObject
         General = new GeneralViewModel();
         var preview = new VoicePreviewService();
         Sapi = new SapiVoiceViewModel(new SapiVoiceService(), preview, General);
+
+        // After installing the Irish pack, re-enumerate so Orla shows in the picker.
+        Voices = new VoiceManagementViewModel(
+            new IrishVoiceInstallService(), () => Sapi.LoadFrom(_model));
 
         General.LoadFrom(_model);
         Sapi.LoadFrom(_model);
