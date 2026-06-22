@@ -37,6 +37,9 @@
 
         <!-- Classic SAPI voice enumeration + speech (Windows). -->
         <PackageReference Include="System.Speech" Version="10.0.9" />
+
+        <!-- Installer + auto-update. vpk CLI version MUST match this. -->
+        <PackageReference Include="Velopack" Version="1.2.0" />
     </ItemGroup>
 
 </Project>
