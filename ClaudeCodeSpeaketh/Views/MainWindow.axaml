@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:ClaudeCodeSpeaketh.ViewModels"
+        xmlns:m="using:ClaudeCodeSpeaketh.Models"
         mc:Ignorable="d"
         d:DesignWidth="820" d:DesignHeight="640"
         x:Class="ClaudeCodeSpeaketh.Views.MainWindow"
@@ -11,9 +12,88 @@
         Width="820" Height="640" MinWidth="640" MinHeight="520"
         WindowStartupLocation="CenterScreen">
 
-    <StackPanel Margin="24" Spacing="6" VerticalAlignment="Top">
-        <TextBlock Text="{Binding Heading}" FontSize="24" FontWeight="SemiBold" />
-        <TextBlock Text="{Binding Subheading}" FontSize="13" Opacity="0.6" />
-    </StackPanel>
+    <Grid RowDefinitions="Auto,*,Auto" Margin="20" RowSpacing="14">
 
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Spacing="2">
+            <TextBlock Text="ClaudeCodeSpeaketh" FontSize="22" FontWeight="SemiBold" />
+            <TextBlock Text="Configure how Claude Code reads its responses aloud."
+                       FontSize="12" Opacity="0.6" />
+        </StackPanel>
+
+        <!-- Tabs -->
+        <TabControl Grid.Row="1">
+
+            <!-- General -->
+            <TabItem Header="General">
+                <StackPanel Margin="6,12" Spacing="16" MaxWidth="520" HorizontalAlignment="Left">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Spoken responses" FontWeight="SemiBold" />
+                        <ToggleSwitch IsChecked="{Binding General.Enabled}"
+                                      OnContent="On" OffContent="Off" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="How much to read per turn" FontWeight="SemiBold" />
+                        <CheckBox IsChecked="{Binding General.SpeakEntireResponse}"
+                                  Content="Speak the entire response (ALL)" />
+                        <StackPanel Orientation="Horizontal" Spacing="8"
+                                    IsEnabled="{Binding General.MaxCharsEnabled}">
+                            <TextBlock Text="Otherwise cap at" VerticalAlignment="Center" />
+                            <NumericUpDown Value="{Binding General.MaxCharsValue}"
+                                           Minimum="50" Maximum="20000" Increment="50" Width="140" />
+                            <TextBlock Text="characters" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Rate (slower … faster)" FontWeight="SemiBold" />
+                        <Slider Value="{Binding General.Rate}" Minimum="-10" Maximum="10"
+                                TickFrequency="1" IsSnapToTickEnabled="True" Width="360"
+                                HorizontalAlignment="Left" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Volume" FontWeight="SemiBold" />
+                        <Slider Value="{Binding General.Volume}" Minimum="0" Maximum="100"
+                                TickFrequency="10" Width="360" HorizontalAlignment="Left" />
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+
+            <!-- SAPI Voices -->
+            <TabItem Header="SAPI Voices">
+                <StackPanel Margin="6,12" Spacing="14" MaxWidth="560" HorizontalAlignment="Left">
+                    <TextBlock Text="Pick the Windows voice the hook speaks with."
+                               Opacity="0.7" />
+                    <ComboBox ItemsSource="{Binding Sapi.Voices}"
+                              SelectedItem="{Binding Sapi.SelectedVoice}"
+                              Width="520" HorizontalAlignment="Left">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="m:SapiVoiceInfo">
+                                <TextBlock Text="{Binding Display}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="▶ Preview" Command="{Binding Sapi.PreviewCommand}" />
+                        <Button Content="■ Stop" Command="{Binding Sapi.StopPreviewCommand}" />
+                    </StackPanel>
+                    <TextBlock Text="Tip: en-GB voices (Hazel/Susan) are British; the Irish 'Orla' voice arrives in a later update."
+                               FontSize="11" Opacity="0.5" TextWrapping="Wrap" />
+                </StackPanel>
+            </TabItem>
+
+        </TabControl>
+
+        <!-- Footer: save + status -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <TextBlock Grid.Column="0" Text="{Binding Status}"
+                       VerticalAlignment="Center" TextWrapping="Wrap"
+                       FontSize="12" Opacity="0.75" />
+            <Button Grid.Column="1" Content="Save"
+                    Command="{Binding SaveCommand}"
+                    Background="#5d63ff" Foreground="White" Padding="20,8" />
+        </Grid>
+    </Grid>
 </Window>

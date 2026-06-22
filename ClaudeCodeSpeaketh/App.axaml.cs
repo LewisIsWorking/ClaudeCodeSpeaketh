@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -6,6 +7,8 @@ using ClaudeCodeSpeaketh.Views;
 
 namespace ClaudeCodeSpeaketh;
 
+// The whole app is Windows-only (System.Speech + speech registry).
+[SupportedOSPlatform("windows")]
 public partial class App : Application
 {
     public override void Initialize() => AvaloniaXamlLoader.Load(this);

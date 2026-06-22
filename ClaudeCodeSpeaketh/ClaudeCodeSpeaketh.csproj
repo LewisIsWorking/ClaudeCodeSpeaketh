@@ -2,14 +2,14 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net10.0</TargetFramework>
+        <!-- Windows-only TFM: marks the whole assembly as 'windows' so CA1416
+             does not fire for System.Speech / speech-registry calls. -->
+        <TargetFramework>net10.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <Version>0.1.0</Version>
-        <!-- Windows-only: we touch System.Speech + the registry for SAPI voices. -->
-        <SupportedOSPlatform>windows</SupportedOSPlatform>
     </PropertyGroup>
 
     <ItemGroup>
