@@ -15,11 +15,17 @@
     <Grid RowDefinitions="Auto,*,Auto" Margin="20" RowSpacing="14">
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Spacing="2">
-            <TextBlock Text="ClaudeCodeSpeaketh" FontSize="22" FontWeight="SemiBold" />
-            <TextBlock Text="Configure how Claude Code reads its responses aloud."
-                       FontSize="12" Opacity="0.6" />
-        </StackPanel>
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="2">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="ClaudeCodeSpeaketh" FontSize="22" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Update.VersionLabel}" FontSize="13"
+                               VerticalAlignment="Bottom" Margin="0,0,0,3" Opacity="0.5" />
+                </StackPanel>
+                <TextBlock Text="Configure how Claude Code reads its responses aloud."
+                           FontSize="12" Opacity="0.6" />
+            </StackPanel>
+        </Grid>
 
         <!-- Tabs -->
         <TabControl Grid.Row="1">
@@ -99,9 +105,33 @@
                                 Command="{Binding Voices.RefreshVoicesCommand}"
                                 IsEnabled="{Binding !Voices.IsBusy}" Padding="12,8" />
                     </StackPanel>
-                    <ProgressBar IsIndeterminate="True" IsVisible="{Binding Voices.IsBusy}"
-                                 Height="6" HorizontalAlignment="Stretch" />
+                    <ProgressBar Minimum="0" Maximum="100"
+                                 Value="{Binding Voices.InstallPercent}"
+                                 IsIndeterminate="{Binding Voices.InstallIndeterminate}"
+                                 IsVisible="{Binding Voices.IsBusy}"
+                                 ShowProgressText="True" Height="18" HorizontalAlignment="Stretch" />
                     <TextBlock Text="{Binding Voices.Status}" FontSize="12" Opacity="0.75" TextWrapping="Wrap" />
+                </StackPanel>
+            </TabItem>
+
+            <!-- Updates -->
+            <TabItem Header="Updates">
+                <StackPanel Margin="6,12" Spacing="14" MaxWidth="560" HorizontalAlignment="Left">
+                    <TextBlock Text="{Binding Update.VersionLabel, StringFormat='Installed version: {0}'}"
+                               FontWeight="SemiBold" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Check for updates"
+                                Command="{Binding Update.CheckCommand}"
+                                IsEnabled="{Binding !Update.IsBusy}" Padding="12,8" />
+                        <Button Content="Download &amp; install"
+                                Command="{Binding Update.DownloadAndApplyCommand}"
+                                IsEnabled="{Binding !Update.IsBusy}"
+                                Background="#5d63ff" Foreground="White" Padding="12,8" />
+                    </StackPanel>
+                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding Update.DownloadPercent}"
+                                 IsVisible="{Binding Update.ShowProgress}"
+                                 ShowProgressText="True" Height="18" HorizontalAlignment="Stretch" />
+                    <TextBlock Text="{Binding Update.Status}" FontSize="12" Opacity="0.75" TextWrapping="Wrap" />
                 </StackPanel>
             </TabItem>
 

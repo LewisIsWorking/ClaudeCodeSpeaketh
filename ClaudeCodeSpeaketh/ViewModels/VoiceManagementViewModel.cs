@@ -1,16 +1,16 @@
 using System;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ClaudeCodeSpeaketh.Helpers;
 using ClaudeCodeSpeaketh.Services;
 
 namespace ClaudeCodeSpeaketh.ViewModels;
 
-// "Get Voices" tab: install the Irish voice (Orla). Modern System.Speech reads
-// OneCore voices directly, so once the en-IE pack is installed the voice simply
-// appears in the SAPI picker after a refresh -- no registry mirror needed.
+// "Get Voices" tab: install the Irish voice (Orla) with a REAL percentage parsed
+// from DISM's output. Once installed, modern System.Speech sees it directly, so a
+// refresh surfaces it in the SAPI picker -- no registry mirror needed.
 [SupportedOSPlatform("windows")]
 internal partial class VoiceManagementViewModel : ObservableObject
 {
@@ -20,6 +20,8 @@ internal partial class VoiceManagementViewModel : ObservableObject
     [ObservableProperty] private string _status =
         "Click below to install the Irish voice (Orla), then it appears in the SAPI Voices tab.";
     [ObservableProperty] private bool _isBusy;
+    [ObservableProperty] private double _installPercent;
+    [ObservableProperty] private bool _installIndeterminate;
 
     public VoiceManagementViewModel(IrishVoiceInstallService install, Action refreshVoices)
     {
@@ -31,17 +33,39 @@ internal partial class VoiceManagementViewModel : ObservableObject
     private async Task InstallIrishAsync()
     {
         IsBusy = true;
-        Status = "Installing the Irish voice (Orla) -- approve the UAC prompt; this can take a few minutes...";
-        var result = await Task.Run(() => _install.Install());
-        IsBusy = false;
+        InstallIndeterminate = true;   // until DISM emits the first %
+        InstallPercent = 0;
+        Status = "Installing the Irish voice (Orla) -- approve the UAC prompt; downloading from Windows Update...";
 
-        if (result.Declined) { Status = "Cancelled at the UAC prompt."; return; }
-        if (!result.Started) { Status = "Failed to elevate: " + (result.Error ?? "unknown error"); return; }
-        if (result.ExitCode != 0) { Status = $"Installer exited with code {result.ExitCode}."; return; }
+        var proc = _install.Start();
+        if (proc is null)
+        {
+            IsBusy = false; InstallIndeterminate = false;
+            Status = "Cancelled at the UAC prompt (or failed to elevate).";
+            return;
+        }
 
+        await Task.Run(async () =>
+        {
+            while (!proc.HasExited)
+            {
+                var p = _install.ReadPercent();
+                if (p >= 0) Dispatcher.UIThread.Post(() => { InstallIndeterminate = false; InstallPercent = p; });
+                await Task.Delay(400);
+            }
+        });
+
+        int exit; try { exit = proc.ExitCode; } catch { exit = 0; }
+        InstallIndeterminate = false; InstallPercent = 100; IsBusy = false;
+
+        if (exit != 0)
+        {
+            Status = $"Installer exited with code {exit}. Log: {_install.ProgressFile}";
+            return;
+        }
         _refreshVoices();
-        Status = "Install complete. Look for 'Microsoft Orla' in the SAPI Voices tab. " +
-                 "If it's missing, sign out and back in, then click Refresh voices.";
+        Status = "Install complete. Pick 'Microsoft Orla' in the SAPI Voices tab. " +
+                 "If it's missing, sign out/in then click Refresh voices.";
     }
 
     [RelayCommand]

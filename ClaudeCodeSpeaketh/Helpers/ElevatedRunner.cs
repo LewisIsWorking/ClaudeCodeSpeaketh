@@ -20,6 +20,23 @@ internal static class ElevatedRunner
     public static ElevatedResult RunReg(params string[] regArgs)
         => Run("reg.exe", regArgs);
 
+    // Non-blocking elevated launch: returns the started Process (or null if the
+    // user declined / it failed) so the caller can poll progress and await exit.
+    public static Process? StartPowerShell(string command)
+    {
+        var psi = new ProcessStartInfo
+        {
+            FileName = "powershell",
+            UseShellExecute = true,
+            Verb = "runas",
+            WindowStyle = ProcessWindowStyle.Hidden,
+        };
+        foreach (var a in new[] { "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", command })
+            psi.ArgumentList.Add(a);
+        try { return Process.Start(psi); }
+        catch { return null; }
+    }
+
     private static ElevatedResult Run(string fileName, string[] arguments)
     {
         var psi = new ProcessStartInfo
