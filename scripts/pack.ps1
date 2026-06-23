@@ -12,6 +12,7 @@ $root = Split-Path -Parent $PSScriptRoot
 $proj = Join-Path $root 'ClaudeCodeSpeaketh\ClaudeCodeSpeaketh.csproj'
 $pub  = Join-Path $root 'publish'
 $rel  = Join-Path $root 'Releases'
+$icon = Join-Path $root 'ClaudeCodeSpeaketh\Assets\app.ico'
 
 Write-Host "==> Publishing self-contained win-x64..." -ForegroundColor Cyan
 if (Test-Path $pub) { Remove-Item -LiteralPath $pub -Recurse -Force }
@@ -41,6 +42,7 @@ vpk pack `
     --mainExe ClaudeCodeSpeaketh.exe `
     --packTitle "ClaudeCodeSpeaketh" `
     --packAuthors "Lewis" `
+    --icon $icon `
     --outputDir $rel `
     @signArgs
 if ($LASTEXITCODE -ne 0) { throw "vpk pack failed" }
