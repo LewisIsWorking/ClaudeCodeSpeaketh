@@ -19,6 +19,7 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly DaemonHeartbeat? _heartbeat;
     private readonly SpeechQueueProcessor? _processor;
     private TtsConfig _model;
+    private bool _ready;
 
     public GeneralViewModel General { get; }
     public NeuralViewModel Neural { get; }
@@ -57,6 +58,14 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
         Neural.LoadFrom(_model);
         Karaoke.LoadFrom(_model);
 
+        // Persist every setting change immediately so the daemon (which reads config
+        // fresh each turn) reflects it on the next response -- no Save click needed.
+        General.PropertyChanged += (_, _) => PersistLive();
+        Sapi.PropertyChanged += (_, _) => PersistLive();
+        Neural.PropertyChanged += (_, _) => PersistLive();
+        Karaoke.PropertyChanged += (_, _) => PersistLive();
+        _ready = true;
+
         // Resident daemon: heartbeat so the hook enqueues to us, plus the queue
         // processor that serializes playback across sessions. Reads fresh config
         // each item so engine/voice/session toggles apply live. Single-instance:
@@ -75,6 +84,21 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         _processor?.Dispose();
         _heartbeat?.Dispose();
+    }
+
+    // Writes the current settings to disk on any change (live).
+    private void PersistLive()
+    {
+        if (!_ready) return;
+        try
+        {
+            General.ApplyTo(_model);
+            Sapi.ApplyTo(_model);
+            Neural.ApplyTo(_model);
+            Karaoke.ApplyTo(_model);
+            _config.Save(_model);
+        }
+        catch { /* best-effort; explicit Save surfaces errors */ }
     }
 
     [RelayCommand]

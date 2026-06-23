@@ -10,13 +10,15 @@ internal sealed partial class SessionToggle : ObservableObject
 
     public string Id { get; }
     public string Display { get; }
+    public string Detail { get; }   // branch · full path · last-active
 
     [ObservableProperty] private bool _enabled;
 
-    public SessionToggle(string id, string display, bool enabled, Action<SessionToggle> onChanged)
+    public SessionToggle(string id, string display, string detail, bool enabled, Action<SessionToggle> onChanged)
     {
         Id = id;
         Display = display;
+        Detail = detail;
         _enabled = enabled;
         _onChanged = onChanged;
     }

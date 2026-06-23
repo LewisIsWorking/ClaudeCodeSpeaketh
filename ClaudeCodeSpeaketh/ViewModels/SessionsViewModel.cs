@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -34,17 +35,18 @@ internal partial class SessionsViewModel : ObservableObject
     [RelayCommand]
     private void Refresh()
     {
-        foreach (var (id, cwd) in _discovery.Discover()) NoteSession(id, cwd);
+        foreach (var d in _discovery.Discover())
+            NoteSession(d.Id, d.Cwd, d.Branch, d.LastActiveUtc);
     }
 
-    // Called (on the UI thread) when the daemon sees a session.
-    public void NoteSession(string id, string cwd)
+    // Called (on the UI thread) for discovered + live-heard sessions.
+    public void NoteSession(string id, string cwd, string branch = "", DateTime? lastActiveUtc = null)
     {
         if (string.IsNullOrWhiteSpace(id)) return;
         if (Sessions.Any(s => s.Id == id)) return;
         var cfg = _load();
         var enabled = !cfg.SessionOverrides.TryGetValue(id, out var on) || on;
-        Sessions.Add(new SessionToggle(id, BuildLabel(id, cwd), enabled, Persist));
+        Sessions.Add(new SessionToggle(id, BuildLabel(id, cwd), BuildDetail(cwd, branch, lastActiveUtc), enabled, Persist));
     }
 
     // Prefer the terminal's project-folder name; fall back to a short id.
@@ -54,6 +56,25 @@ internal partial class SessionsViewModel : ObservableObject
         var leaf = string.IsNullOrWhiteSpace(cwd)
             ? "" : Path.GetFileName(cwd.TrimEnd('\\', '/'));
         return leaf.Length > 0 ? $"{leaf}   ({shortId})" : shortId;
+    }
+
+    // Second line: branch · full path · last-active.
+    private static string BuildDetail(string cwd, string branch, DateTime? lastActiveUtc)
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(branch)) parts.Add("⎇ " + branch);
+        if (!string.IsNullOrWhiteSpace(cwd)) parts.Add(cwd);
+        parts.Add(lastActiveUtc is { } t ? RelativeTime(t) : "active now");
+        return string.Join("   ·   ", parts);
+    }
+
+    private static string RelativeTime(DateTime utc)
+    {
+        var span = DateTime.UtcNow - utc;
+        if (span.TotalMinutes < 1) return "just now";
+        if (span.TotalMinutes < 60) return $"{(int)span.TotalMinutes}m ago";
+        if (span.TotalHours < 24) return $"{(int)span.TotalHours}h ago";
+        return $"{(int)span.TotalDays}d ago";
     }
 
     private void Persist(SessionToggle t)
