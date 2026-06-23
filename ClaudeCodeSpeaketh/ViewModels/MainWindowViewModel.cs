@@ -26,6 +26,7 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
     public VoiceManagementViewModel Voices { get; }
     public SessionsViewModel Sessions { get; }
     public KaraokeViewModel Karaoke { get; }
+    public HookManagementViewModel Hook { get; }
     public UpdateViewModel Update { get; }
 
     [ObservableProperty] private string _status = "Ready.";
@@ -48,6 +49,7 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
         Update = new UpdateViewModel(new UpdateService());
         Sessions = new SessionsViewModel(() => _model, cfg => _config.Save(cfg));
         Karaoke = new KaraokeViewModel();
+        Hook = new HookManagementViewModel(new HookInstallService(_config.HooksDir), _deploy);
 
         General.LoadFrom(_model);
         Sapi.LoadFrom(_model);
