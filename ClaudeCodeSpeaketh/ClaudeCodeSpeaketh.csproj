@@ -9,6 +9,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <!-- Embeds the Win32 icon in the .exe -> taskbar + Explorer use the logo
+             (Window.Icon only covers the title bar / alt-tab). -->
+        <ApplicationIcon>Assets\app.ico</ApplicationIcon>
         <Version>0.1.0</Version>
     </PropertyGroup>
 
