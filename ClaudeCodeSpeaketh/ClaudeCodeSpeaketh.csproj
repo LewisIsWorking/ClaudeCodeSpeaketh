@@ -40,6 +40,9 @@
 
         <!-- Installer + auto-update. vpk CLI version MUST match this. -->
         <PackageReference Include="Velopack" Version="1.2.0" />
+
+        <!-- In-process MP3 playback (+ position) for the karaoke window. -->
+        <PackageReference Include="NAudio" Version="2.2.1" />
     </ItemGroup>
 
 </Project>

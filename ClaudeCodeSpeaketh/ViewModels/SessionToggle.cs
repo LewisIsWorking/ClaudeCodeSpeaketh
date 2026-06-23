@@ -13,10 +13,10 @@ internal sealed partial class SessionToggle : ObservableObject
 
     [ObservableProperty] private bool _enabled;
 
-    public SessionToggle(string id, bool enabled, Action<SessionToggle> onChanged)
+    public SessionToggle(string id, string display, bool enabled, Action<SessionToggle> onChanged)
     {
         Id = id;
-        Display = id.Length > 8 ? id.Substring(0, 8) + "..." : id;
+        Display = display;
         _enabled = enabled;
         _onChanged = onChanged;
     }

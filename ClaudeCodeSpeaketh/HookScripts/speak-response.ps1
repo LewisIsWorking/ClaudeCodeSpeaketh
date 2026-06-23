@@ -80,7 +80,8 @@ try {
         $queueDir = Join-Path $PSScriptRoot 'tts-queue'
         New-Item -ItemType Directory -Path $queueDir -Force | Out-Null
         $sid = if ($data.session_id) { [string]$data.session_id } else { 'unknown' }
-        $payload = @{ sessionId = $sid; text = $text } | ConvertTo-Json -Compress
+        $cwd = if ($data.cwd) { [string]$data.cwd } else { '' }
+        $payload = @{ sessionId = $sid; cwd = $cwd; text = $text } | ConvertTo-Json -Compress
         $name = ([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds().ToString()) + '-' +
                 ([guid]::NewGuid().ToString('N').Substring(0, 6)) + '.json'
         Set-Content -LiteralPath (Join-Path $queueDir $name) -Value $payload -Encoding UTF8

@@ -16,8 +16,8 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
 {
     private readonly ConfigService _config;
     private readonly HookScriptDeployService _deploy;
-    private readonly DaemonHeartbeat _heartbeat;
-    private readonly SpeechQueueProcessor _processor;
+    private readonly DaemonHeartbeat? _heartbeat;
+    private readonly SpeechQueueProcessor? _processor;
     private TtsConfig _model;
 
     public GeneralViewModel General { get; }
@@ -25,6 +25,7 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
     public SapiVoiceViewModel Sapi { get; }
     public VoiceManagementViewModel Voices { get; }
     public SessionsViewModel Sessions { get; }
+    public KaraokeViewModel Karaoke { get; }
     public UpdateViewModel Update { get; }
 
     [ObservableProperty] private string _status = "Ready.";
@@ -46,25 +47,31 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
 
         Update = new UpdateViewModel(new UpdateService());
         Sessions = new SessionsViewModel(() => _model, cfg => _config.Save(cfg));
+        Karaoke = new KaraokeViewModel();
 
         General.LoadFrom(_model);
         Sapi.LoadFrom(_model);
         Neural.LoadFrom(_model);
+        Karaoke.LoadFrom(_model);
 
         // Resident daemon: heartbeat so the hook enqueues to us, plus the queue
         // processor that serializes playback across sessions. Reads fresh config
-        // each item so engine/voice/session toggles apply live.
+        // each item so engine/voice/session toggles apply live. Single-instance:
+        // if another copy already owns the queue, this one is just a config editor.
         _deploy.DeployAll();   // ensure hooks are current for queue mode
-        _heartbeat = new DaemonHeartbeat(_config.HooksDir);
-        _processor = new SpeechQueueProcessor(_config.HooksDir, () => _config.Load(),
-            id => Dispatcher.UIThread.Post(() => Sessions.NoteSession(id)));
-        _processor.Start();
+        if (!DaemonHeartbeat.IsAlive(_config.HooksDir))
+        {
+            _heartbeat = new DaemonHeartbeat(_config.HooksDir);
+            _processor = new SpeechQueueProcessor(_config.HooksDir, () => _config.Load(),
+                item => Dispatcher.UIThread.Post(() => Sessions.NoteSession(item.SessionId, item.Cwd)));
+            _processor.Start();
+        }
     }
 
     public void Dispose()
     {
-        _processor.Dispose();
-        _heartbeat.Dispose();
+        _processor?.Dispose();
+        _heartbeat?.Dispose();
     }
 
     [RelayCommand]
@@ -75,6 +82,7 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
             General.ApplyTo(_model);
             Sapi.ApplyTo(_model);
             Neural.ApplyTo(_model);
+            Karaoke.ApplyTo(_model);
             _config.Save(_model);
 
             var written = _deploy.DeployAll();

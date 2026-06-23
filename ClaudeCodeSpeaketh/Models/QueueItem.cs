@@ -4,5 +4,6 @@ namespace ClaudeCodeSpeaketh.Models;
 internal sealed class QueueItem
 {
     public string SessionId { get; set; } = "";
+    public string Cwd { get; set; } = "";   // the terminal's working dir (for a friendly label)
     public string Text { get; set; } = "";
 }

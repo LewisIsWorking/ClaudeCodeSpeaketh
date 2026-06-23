@@ -17,8 +17,9 @@ internal sealed class SpeechQueueProcessor : IDisposable
 
     private readonly string _queueDir;
     private readonly Func<TtsConfig> _config;
-    private readonly Action<string>? _onSessionSeen;
+    private readonly Action<QueueItem>? _onSessionSeen;
     private readonly SpeechRunner _runner;
+    private readonly EdgeKaraokePlayer _karaoke;
     private readonly SemaphoreSlim _signal = new(0);
     private readonly CancellationTokenSource _stop = new();
 
@@ -26,13 +27,14 @@ internal sealed class SpeechQueueProcessor : IDisposable
     private volatile string? _currentSession;
     private CancellationTokenSource? _currentCts;
 
-    public SpeechQueueProcessor(string hooksDir, Func<TtsConfig> config, Action<string>? onSessionSeen = null)
+    public SpeechQueueProcessor(string hooksDir, Func<TtsConfig> config, Action<QueueItem>? onSessionSeen = null)
     {
         _queueDir = Path.Combine(hooksDir, "tts-queue");
         Directory.CreateDirectory(_queueDir);
         _config = config;
         _onSessionSeen = onSessionSeen;
         _runner = new SpeechRunner(hooksDir);
+        _karaoke = new EdgeKaraokePlayer(hooksDir);
     }
 
     public void Start()
@@ -48,7 +50,7 @@ internal sealed class SpeechQueueProcessor : IDisposable
         var item = ReadItem(e.FullPath);
         if (item is not null)
         {
-            _onSessionSeen?.Invoke(item.SessionId);
+            _onSessionSeen?.Invoke(item);
             // Newer utterance from the session currently speaking -> interrupt it.
             if (item.SessionId == _currentSession) _currentCts?.Cancel();
         }
@@ -83,7 +85,15 @@ internal sealed class SpeechQueueProcessor : IDisposable
 
             _currentSession = item.SessionId;
             _currentCts = new CancellationTokenSource();
-            try { _runner.Speak(item.Text, _currentCts.Token); } catch { }
+            try
+            {
+                // Edge + karaoke -> companion window with word highlighting;
+                // anything else (or karaoke failure) -> plain speak.
+                var handled = cfg.Engine == "edge" && cfg.Karaoke.Enabled
+                              && _karaoke.Play(item.Text, cfg, _currentCts.Token);
+                if (!handled) _runner.Speak(item.Text, _currentCts.Token);
+            }
+            catch { }
             finally { _currentSession = null; _currentCts.Dispose(); _currentCts = null; }
         }
     }

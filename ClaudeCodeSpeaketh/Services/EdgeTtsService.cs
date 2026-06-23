@@ -15,17 +15,17 @@ internal sealed class EdgeTtsService
 
     /// <summary>Fast, offline check that python + the edge_tts module import.</summary>
     public bool IsAvailable()
-        => Run("python", new[] { "-c", "import edge_tts" }, 8000).code == 0;
+        => Run(PythonResolver.Exe, new[] { "-c", "import edge_tts" }, 8000).code == 0;
 
     /// <summary>pip-installs edge-tts (network). Returns true on success.</summary>
     public bool Install()
-        => Run("python", new[] { "-m", "pip", "install", "--user", "edge-tts" }, 120000).code == 0;
+        => Run(PythonResolver.Exe, new[] { "-m", "pip", "install", "--user", "edge-tts" }, 120000).code == 0;
 
     /// <summary>Fetches the voice catalogue (network) and keeps the English voices.</summary>
     public IReadOnlyList<EdgeVoiceInfo> GetEnglishVoices()
     {
         var list = new List<EdgeVoiceInfo>();
-        var (code, output) = Run("python", new[] { "-m", "edge_tts", "--list-voices" }, 30000);
+        var (code, output) = Run(PythonResolver.Exe, new[] { "-m", "edge_tts", "--list-voices" }, 30000);
         if (code != 0) return list;
 
         foreach (var raw in output.Split('\n'))

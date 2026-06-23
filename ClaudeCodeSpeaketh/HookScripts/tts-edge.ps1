@@ -12,6 +12,18 @@ param(
     [string]$Rate  = '+0%'
 )
 
+# Resolve a python that actually has edge_tts, skipping the Microsoft Store stub
+# (WindowsApps\python.exe) which a non-shell launcher often hits first.
+function Get-Python {
+    $cands = @()
+    try { $cands += (& where.exe python 2>$null) | Where-Object { $_ -and ($_ -notmatch 'WindowsApps') } } catch {}
+    $cands += @('py', 'python')
+    foreach ($c in $cands) {
+        try { & $c -c "import edge_tts" 2>$null; if ($LASTEXITCODE -eq 0) { return $c } } catch {}
+    }
+    return 'python'
+}
+
 function Invoke-EdgeSpeak {
     param([string]$TextFile, [string]$Text, [string]$Voice, [string]$Rate)
 
@@ -24,7 +36,8 @@ function Invoke-EdgeSpeak {
     else { return $false }
 
     # Generate (needs python + edge_tts + internet). Any failure -> fall back.
-    try { & python @genArgs 2>$null } catch { return $false }
+    $py = Get-Python
+    try { & $py @genArgs 2>$null } catch { return $false }
     if ($LASTEXITCODE -ne 0) { return $false }
     if (-not (Test-Path -LiteralPath $mp3) -or (Get-Item -LiteralPath $mp3).Length -lt 64) { return $false }
 

@@ -1,0 +1,15 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ClaudeCodeSpeaketh.Views.KaraokeWindow"
+        Topmost="True" ShowInTaskbar="False" WindowDecorations="None"
+        Background="Transparent" CanResize="False"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterScreen">
+
+    <Border Background="#E6101014" CornerRadius="14" Padding="26,20"
+            BorderBrush="#33363d" BorderThickness="1">
+        <TextBlock Name="WordsBlock" MaxWidth="860"
+                   FontSize="26" LineHeight="42" TextWrapping="Wrap"
+                   Foreground="#9aa0a6" />
+    </Border>
+</Window>

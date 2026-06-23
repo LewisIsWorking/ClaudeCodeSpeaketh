@@ -162,13 +162,36 @@
             <TabItem Header="Sessions">
                 <StackPanel Margin="6,12" Spacing="10" MaxWidth="560" HorizontalAlignment="Left">
                     <TextBlock Text="{Binding Sessions.Hint}" Opacity="0.7" TextWrapping="Wrap" />
-                    <ItemsControl ItemsSource="{Binding Sessions.Sessions}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:SessionToggle">
-                                <CheckBox IsChecked="{Binding Enabled}" Content="{Binding Display}" Margin="0,2" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <ScrollViewer MaxHeight="380" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding Sessions.Sessions}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SessionToggle">
+                                    <CheckBox IsChecked="{Binding Enabled}" Content="{Binding Display}"
+                                              Margin="0,2" FontFamily="Consolas, Courier New" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Karaoke -->
+            <TabItem Header="Karaoke">
+                <StackPanel Margin="6,12" Spacing="14" MaxWidth="560" HorizontalAlignment="Left">
+                    <CheckBox IsChecked="{Binding Karaoke.Enabled}"
+                              Content="Show the karaoke window (highlights each word as it is spoken)" />
+                    <TextBlock Text="Active only with the resident app running and the Neural engine selected."
+                               FontSize="11" Opacity="0.5" TextWrapping="Wrap" />
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Highlight colour" FontWeight="SemiBold" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Text="{Binding Karaoke.ColorHex}" Width="130" />
+                            <Button Content="Amber" Command="{Binding Karaoke.SetColorCommand}" CommandParameter="#FFD54A" />
+                            <Button Content="Cyan"  Command="{Binding Karaoke.SetColorCommand}" CommandParameter="#4ADEDE" />
+                            <Button Content="Pink"  Command="{Binding Karaoke.SetColorCommand}" CommandParameter="#FF6FB5" />
+                            <Button Content="Green" Command="{Binding Karaoke.SetColorCommand}" CommandParameter="#7CE38B" />
+                        </StackPanel>
+                    </StackPanel>
                 </StackPanel>
             </TabItem>
 

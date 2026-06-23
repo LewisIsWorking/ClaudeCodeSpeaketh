@@ -17,6 +17,7 @@ internal sealed class HookScriptDeployService
         "speak-response.ps1",
         "tts-speaker.ps1",
         "tts-edge.ps1",
+        "edge-karaoke.py",
     };
 
     private readonly string _hooksDir;
