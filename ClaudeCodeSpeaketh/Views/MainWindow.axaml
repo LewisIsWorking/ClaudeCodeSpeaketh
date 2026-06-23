@@ -158,6 +158,20 @@
                 </StackPanel>
             </TabItem>
 
+            <!-- Sessions -->
+            <TabItem Header="Sessions">
+                <StackPanel Margin="6,12" Spacing="10" MaxWidth="560" HorizontalAlignment="Left">
+                    <TextBlock Text="{Binding Sessions.Hint}" Opacity="0.7" TextWrapping="Wrap" />
+                    <ItemsControl ItemsSource="{Binding Sessions.Sessions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SessionToggle">
+                                <CheckBox IsChecked="{Binding Enabled}" Content="{Binding Display}" Margin="0,2" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </TabItem>
+
             <!-- Updates -->
             <TabItem Header="Updates">
                 <StackPanel Margin="6,12" Spacing="14" MaxWidth="560" HorizontalAlignment="Left">

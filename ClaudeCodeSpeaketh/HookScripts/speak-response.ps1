@@ -62,15 +62,38 @@ try {
         $text = $cut.TrimEnd() + ' ...'
     }
 
-    # --- interrupt any speech still running from the previous turn -------------
+    # --- if the resident app (daemon) is alive, enqueue; else speak directly ---
+    $lock = Join-Path $PSScriptRoot '.tts-daemon.lock'
+    $daemonAlive = $false
+    if (Test-Path -LiteralPath $lock) {
+        $parts = (Get-Content -LiteralPath $lock -Raw) -split "`n"
+        if ($parts.Count -ge 2) {
+            $ts = $parts[1].Trim() -as [int64]
+            $now = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+            if ($ts -and (($now - $ts) -lt 15)) { $daemonAlive = $true }
+        }
+    }
+
+    if ($daemonAlive) {
+        # Drop a {sessionId, text} file; the resident app serializes playback
+        # across sessions and drives the karaoke window.
+        $queueDir = Join-Path $PSScriptRoot 'tts-queue'
+        New-Item -ItemType Directory -Path $queueDir -Force | Out-Null
+        $sid = if ($data.session_id) { [string]$data.session_id } else { 'unknown' }
+        $payload = @{ sessionId = $sid; text = $text } | ConvertTo-Json -Compress
+        $name = ([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds().ToString()) + '-' +
+                ([guid]::NewGuid().ToString('N').Substring(0, 6)) + '.json'
+        Set-Content -LiteralPath (Join-Path $queueDir $name) -Value $payload -Encoding UTF8
+        exit 0
+    }
+
+    # --- daemon not running: interrupt prior speech + speak directly (fallback) -
     $pidFile  = Join-Path $PSScriptRoot '.tts-speaker.pid'
     $textFile = Join-Path $env:TEMP 'coo-claude-tts.txt'
     if (Test-Path -LiteralPath $pidFile) {
         $oldPid = (Get-Content -LiteralPath $pidFile -ErrorAction SilentlyContinue) -as [int]
         if ($oldPid) { try { Stop-Process -Id $oldPid -Force -ErrorAction Stop } catch {} }
     }
-
-    # --- hand the text to the detached speaker and return immediately ----------
     Set-Content -LiteralPath $textFile -Value $text -Encoding UTF8
     $speaker = Join-Path $PSScriptRoot 'tts-speaker.ps1'
     Start-Process -FilePath 'powershell' `

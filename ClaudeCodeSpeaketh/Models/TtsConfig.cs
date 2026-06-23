@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ClaudeCodeSpeaketh.Models;
 
 // Serializable mirror of ~/.claude/hooks/tts-config.json -- the single contract
@@ -19,6 +21,12 @@ internal sealed class TtsConfig
     public int MaxChars { get; set; }
 
     public bool StripMarkdown { get; set; } = true;
+
+    /// <summary>Queue across different Claude sessions (vs. only the latest).</summary>
+    public bool QueueAcrossSessions { get; set; } = true;
+
+    /// <summary>Per-session mute: sessionId -> enabled. Absent = enabled.</summary>
+    public Dictionary<string, bool> SessionOverrides { get; set; } = new();
 
     public string? UpdatedBy { get; set; }
     public string? UpdatedUtc { get; set; }
