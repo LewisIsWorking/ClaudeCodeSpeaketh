@@ -32,8 +32,13 @@ public partial class App : Application
 
             // Keep running in the tray when the window is closed.
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            desktop.MainWindow = _window;
             desktop.ShutdownRequested += (_, _) => _vm?.Dispose();
+
+            // Launched at sign-in (--startup): come up hidden in the tray. Leaving
+            // MainWindow unset means the framework shows nothing; the tray's Open
+            // reveals the window on demand.
+            var startHidden = desktop.Args is { } args && Array.IndexOf(args, "--startup") >= 0;
+            if (!startHidden) desktop.MainWindow = _window;
 
             SetUpTray(desktop);
         }
@@ -62,8 +67,12 @@ public partial class App : Application
         }
         catch
         {
-            // No tray (icon missing etc.): fall back to quitting on window close.
+            // No tray (icon missing etc.): fall back to quitting on window close,
+            // and make sure the window is visible -- otherwise a --startup launch
+            // would leave no window and no tray (invisible, unquittable).
             desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
+            desktop.MainWindow = _window;
+            ShowWindow();
         }
     }
 

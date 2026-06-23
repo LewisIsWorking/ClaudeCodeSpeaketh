@@ -38,7 +38,7 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
         _deploy = new HookScriptDeployService(_config.HooksDir);
         _model = _config.Load();
 
-        General = new GeneralViewModel();
+        General = new GeneralViewModel(new StartupService());
         var preview = new VoicePreviewService();
         Sapi = new SapiVoiceViewModel(new SapiVoiceService(), preview, General);
         Neural = new NeuralViewModel(new EdgeTtsService(_config.HooksDir));
@@ -47,7 +47,7 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
         Voices = new VoiceManagementViewModel(
             new IrishVoiceInstallService(), () => Sapi.LoadFrom(_model));
 
-        Update = new UpdateViewModel(new UpdateService());
+        Update = new UpdateViewModel(new UpdateService(), new ChangelogService());
         Sessions = new SessionsViewModel(() => _model, cfg => _config.Save(cfg),
             new SessionDiscoveryService(_config.HooksDir));
         Karaoke = new KaraokeViewModel();

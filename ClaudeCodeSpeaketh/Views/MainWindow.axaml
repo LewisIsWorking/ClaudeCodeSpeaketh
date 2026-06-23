@@ -75,6 +75,12 @@
                         <Slider Value="{Binding General.Volume}" Minimum="0" Maximum="100"
                                 TickFrequency="10" Width="360" HorizontalAlignment="Left" />
                     </StackPanel>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Startup" FontWeight="SemiBold" />
+                        <CheckBox IsChecked="{Binding General.StartAtStartup}"
+                                  Content="Start when I sign in to Windows (hidden in the tray)" />
+                    </StackPanel>
                 </StackPanel>
             </TabItem>
 
@@ -259,6 +265,16 @@
                                  IsVisible="{Binding Update.ShowProgress}"
                                  ShowProgressText="True" Height="18" HorizontalAlignment="Stretch" />
                     <TextBlock Text="{Binding Update.Status}" FontSize="12" Opacity="0.75" TextWrapping="Wrap" />
+
+                    <TextBlock Text="What's new" FontWeight="SemiBold" Margin="0,6,0,0" />
+                    <Border BorderBrush="#33000000" BorderThickness="1" CornerRadius="4"
+                            Height="240" HorizontalAlignment="Stretch">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10,8">
+                            <SelectableTextBlock Text="{Binding Update.Changelog}"
+                                                 FontSize="12" TextWrapping="Wrap"
+                                                 FontFamily="Cascadia Code, Consolas, monospace" />
+                        </ScrollViewer>
+                    </Border>
                 </StackPanel>
             </TabItem>
 

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
+using Avalonia.Input;
 using Avalonia.Media;
 
 namespace ClaudeCodeSpeaketh.Views;
@@ -18,7 +19,20 @@ public partial class KaraokeWindow : Window
 
     private string _position = "Center";
 
-    public KaraokeWindow() => InitializeComponent();
+    public KaraokeWindow()
+    {
+        InitializeComponent();
+        // Borderless window has no title bar to grab: let the user drag it by
+        // pressing anywhere on the overlay. BeginMoveDrag hands off to the OS.
+        Cursor = new Cursor(StandardCursorType.SizeAll);
+        PointerPressed += OnPointerPressed;
+    }
+
+    private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            BeginMoveDrag(e);
+    }
 
     // Font size + screen position. Position is applied once the window is sized.
     public void Configure(int fontSize, string position)

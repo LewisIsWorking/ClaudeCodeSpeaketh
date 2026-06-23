@@ -20,6 +20,9 @@
         <!-- The refactored hook scripts ship inside the exe and are deployed to
              ~/.claude/hooks on demand by HookScriptDeployService (Phase 1). -->
         <EmbeddedResource Include="HookScripts\**" />
+        <!-- Bundled changelog (repo root), shown on the Updates tab. Explicit
+             LogicalName so the resource name is stable despite the ..\ path. -->
+        <EmbeddedResource Include="..\CHANGELOG.md" LogicalName="ClaudeCodeSpeaketh.CHANGELOG.md" />
     </ItemGroup>
 
     <ItemGroup>

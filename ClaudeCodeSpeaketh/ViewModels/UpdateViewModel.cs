@@ -19,15 +19,19 @@ internal partial class UpdateViewModel : ObservableObject
 
     public string VersionLabel { get; }
 
+    /// <summary>Bundled "what's new" history shown in a scroll area.</summary>
+    public string Changelog { get; }
+
     [ObservableProperty] private string _status;
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private bool _updateReady;     // a download finished, ready to apply
     [ObservableProperty] private double _downloadPercent;
     [ObservableProperty] private bool _showProgress;
 
-    public UpdateViewModel(UpdateService updates)
+    public UpdateViewModel(UpdateService updates, ChangelogService changelog)
     {
         _updates = updates;
+        Changelog = changelog.Load();
         VersionLabel = "v" + _updates.CurrentVersion;
         Status = _updates.IsInstalled
             ? "Click Check for updates."

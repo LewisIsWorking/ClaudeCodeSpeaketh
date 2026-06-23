@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using ClaudeCodeSpeaketh.Models;
+using ClaudeCodeSpeaketh.Services;
 
 namespace ClaudeCodeSpeaketh.ViewModels;
 
@@ -7,7 +8,14 @@ namespace ClaudeCodeSpeaketh.ViewModels;
 // rate/volume sliders. Reads from / writes back to the shared TtsConfig.
 internal partial class GeneralViewModel : ObservableObject
 {
+    private readonly IStartupService _startup;
+
     [ObservableProperty] private bool _enabled = true;
+
+    // Launch at Windows sign-in. Backed by the registry (via IStartupService),
+    // NOT tts-config.json -- so it is loaded once in the ctor and written back
+    // whenever the box is toggled.
+    [ObservableProperty] private bool _startAtStartup;
 
     // Engine: true = Neural (edge-tts), false = Classic (SAPI). Neural is default.
     [ObservableProperty] private bool _useNeural = true;
@@ -22,6 +30,17 @@ internal partial class GeneralViewModel : ObservableObject
     [ObservableProperty] private int _volume = 100; // 0..100
 
     public bool MaxCharsEnabled => !SpeakEntireResponse;
+
+    public GeneralViewModel(IStartupService startup)
+    {
+        _startup = startup;
+        // Set the backing field directly: reflect the current registry state in
+        // the checkbox WITHOUT re-triggering a registry write on load.
+        _startAtStartup = startup.IsEnabled();
+    }
+
+    // Toggling the box adds/removes the Run-key registration immediately.
+    partial void OnStartAtStartupChanged(bool value) => _startup.SetEnabled(value);
 
     public void LoadFrom(TtsConfig cfg)
     {
