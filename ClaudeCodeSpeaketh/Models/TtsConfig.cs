@@ -49,7 +49,9 @@ internal sealed class EdgeSettings
 internal sealed class KaraokeSettings
 {
     // Show the companion window that highlights each word as it's spoken
-    // (resident-app + edge engine only). On by default.
+    // (resident-app only; works with both the edge and SAPI engines). On by default.
     public bool Enabled { get; set; } = true;
     public string ColorHex { get; set; } = "#FFD54A"; // amber highlight
+    public int FontSize { get; set; } = 26;
+    public string Position { get; set; } = "Center";   // Center | Bottom | Top
 }

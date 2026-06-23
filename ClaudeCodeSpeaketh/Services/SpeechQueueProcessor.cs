@@ -20,6 +20,7 @@ internal sealed class SpeechQueueProcessor : IDisposable
     private readonly Action<QueueItem>? _onSessionSeen;
     private readonly SpeechRunner _runner;
     private readonly EdgeKaraokePlayer _karaoke;
+    private readonly SapiKaraokePlayer _sapiKaraoke = new();
     private readonly SemaphoreSlim _signal = new(0);
     private readonly CancellationTokenSource _stop = new();
 
@@ -87,10 +88,15 @@ internal sealed class SpeechQueueProcessor : IDisposable
             _currentCts = new CancellationTokenSource();
             try
             {
-                // Edge + karaoke -> companion window with word highlighting;
-                // anything else (or karaoke failure) -> plain speak.
-                var handled = cfg.Engine == "edge" && cfg.Karaoke.Enabled
-                              && _karaoke.Play(item.Text, cfg, _currentCts.Token);
+                // Karaoke window (edge or SAPI) when enabled; otherwise -- or if
+                // karaoke synthesis fails -- fall back to plain speak.
+                var handled = false;
+                if (cfg.Karaoke.Enabled)
+                {
+                    handled = cfg.Engine == "edge"
+                        ? _karaoke.Play(item.Text, cfg, _currentCts.Token)
+                        : _sapiKaraoke.Play(item.Text, cfg, _currentCts.Token);
+                }
                 if (!handled) _runner.Speak(item.Text, _currentCts.Token);
             }
             catch { }

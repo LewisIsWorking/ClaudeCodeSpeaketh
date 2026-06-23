@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
@@ -15,7 +16,35 @@ public partial class KaraokeWindow : Window
     private Color _hlColor;
     private IBrush? _hlBrush;
 
+    private string _position = "Center";
+
     public KaraokeWindow() => InitializeComponent();
+
+    // Font size + screen position. Position is applied once the window is sized.
+    public void Configure(int fontSize, string position)
+    {
+        if (fontSize > 0) WordsBlock.FontSize = fontSize;
+        _position = position;
+        Opened += (_, _) => ApplyPosition();
+    }
+
+    private void ApplyPosition()
+    {
+        var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
+        if (screen is null) return;
+        var area = screen.WorkingArea;          // device pixels
+        var w = (int)(ClientSize.Width * RenderScaling);
+        var h = (int)(ClientSize.Height * RenderScaling);
+        var x = area.X + (area.Width - w) / 2;  // always horizontally centred
+        var margin = (int)(40 * RenderScaling);
+        var y = _position switch
+        {
+            "Top" => area.Y + margin,
+            "Bottom" => area.Y + area.Height - h - margin,
+            _ => area.Y + (area.Height - h) / 2,
+        };
+        Position = new PixelPoint(x, y);
+    }
 
     public void SetWords(IReadOnlyList<string> words)
     {

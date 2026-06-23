@@ -47,7 +47,8 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
             new IrishVoiceInstallService(), () => Sapi.LoadFrom(_model));
 
         Update = new UpdateViewModel(new UpdateService());
-        Sessions = new SessionsViewModel(() => _model, cfg => _config.Save(cfg));
+        Sessions = new SessionsViewModel(() => _model, cfg => _config.Save(cfg),
+            new SessionDiscoveryService(_config.HooksDir));
         Karaoke = new KaraokeViewModel();
         Hook = new HookManagementViewModel(new HookInstallService(_config.HooksDir), _deploy);
 

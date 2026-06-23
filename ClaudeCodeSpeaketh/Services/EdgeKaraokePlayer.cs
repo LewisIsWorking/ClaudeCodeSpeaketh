@@ -47,6 +47,7 @@ internal sealed class EdgeKaraokePlayer
         {
             win = new KaraokeWindow();
             win.SetWords(words.Select(w => w.Text).ToList());
+            win.Configure(cfg.Karaoke.FontSize, cfg.Karaoke.Position);
             win.Show();
         });
 
