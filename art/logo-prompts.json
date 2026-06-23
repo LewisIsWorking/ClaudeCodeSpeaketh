@@ -1,0 +1,22 @@
+[
+  {
+    "file": "logo-1-bubble-waves.png",
+    "seed": 7,
+    "prompt": "app icon, rounded square, glossy 3d, a speech bubble emitting concentric sound waves, indigo and violet gradient, minimal flat design, centered composition, soft neutral studio background, crisp, dribbble, high quality"
+  },
+  {
+    "file": "logo-2-waveform-bubble.png",
+    "seed": 21,
+    "prompt": "modern app logo mark, a chat speech bubble fused with an audio waveform of equalizer bars, purple indigo gradient, clean flat vector style, centered, plain white background, minimal, premium"
+  },
+  {
+    "file": "logo-3-mic-waves.png",
+    "seed": 33,
+    "prompt": "app icon, a stylized microphone radiating sound waves shaped like a speech bubble, glossy indigo violet, soft gradient background, minimal, centered, smooth, 3d render"
+  },
+  {
+    "file": "logo-4-neon-dark.png",
+    "seed": 48,
+    "prompt": "logo mark, abstract sound waves radiating from a rounded chat bubble, glowing indigo and violet neon on a dark charcoal background, minimal, centered, sleek, app icon"
+  }
+]

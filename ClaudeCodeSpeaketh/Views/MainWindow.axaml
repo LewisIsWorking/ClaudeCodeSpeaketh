@@ -8,6 +8,7 @@
         d:DesignWidth="820" d:DesignHeight="640"
         x:Class="ClaudeCodeSpeaketh.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/app.ico"
         Title="ClaudeCodeSpeaketh"
         Width="820" Height="640" MinWidth="640" MinHeight="520"
         WindowStartupLocation="CenterScreen">

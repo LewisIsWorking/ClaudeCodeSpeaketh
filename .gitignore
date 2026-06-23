@@ -13,6 +13,10 @@ obj/
 publish/
 Releases/
 
+# Generated logo candidates (large; the chosen one lives in Assets/). Keep the
+# prompt recipe (art/logo-prompts.json) tracked for reproducibility.
+art/*.png
+
 # OS cruft
 Thumbs.db
 .DS_Store
