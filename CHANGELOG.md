@@ -2,6 +2,13 @@
 
 All notable changes to ClaudeCodeSpeaketh. Newest first.
 
+## 0.15.0
+- Playback transport: Back / Pause-Resume / Skip controls on both the main window
+  (footer) and the karaoke overlay. Back replays the previous response, Pause/Resume
+  pauses the current one (neural or Classic karaoke), Skip stops it and moves on.
+- The karaoke overlay is now resizeable — drag the bottom-right corner grip; drag the
+  text to move it. Your size and position are remembered for the session.
+
 ## 0.14.0
 - Volume now works on the neural (edge) engine, not just Classic/SAPI. The slider
   was previously ignored for the default voice; it now sets the playback volume on

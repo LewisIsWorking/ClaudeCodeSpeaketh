@@ -30,6 +30,10 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
     public HookManagementViewModel Hook { get; }
     public UpdateViewModel Update { get; }
 
+    // Transport (pause/skip/back) shared by the main window's control bar and the
+    // karaoke overlay. The queue processor drives its state + wires its hooks.
+    public PlaybackController Playback { get; } = new();
+
     [ObservableProperty] private string _status = "Ready.";
 
     public MainWindowViewModel()
@@ -74,7 +78,7 @@ internal partial class MainWindowViewModel : ObservableObject, IDisposable
         if (!DaemonHeartbeat.IsAlive(_config.HooksDir))
         {
             _heartbeat = new DaemonHeartbeat(_config.HooksDir);
-            _processor = new SpeechQueueProcessor(_config.HooksDir, () => _config.Load(),
+            _processor = new SpeechQueueProcessor(_config.HooksDir, () => _config.Load(), Playback,
                 item => Dispatcher.UIThread.Post(() => Sessions.NoteSession(item.SessionId, item.Cwd)));
             _processor.Start();
         }

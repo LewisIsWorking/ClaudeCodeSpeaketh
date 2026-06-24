@@ -15,8 +15,16 @@ namespace ClaudeCodeSpeaketh.Services;
 // SpeakProgress (word-boundary) events -- fully offline, no python/internet.
 // Blocks until done/cancelled. Returns false to fall back to plain speak.
 [SupportedOSPlatform("windows")]
-internal sealed class SapiKaraokePlayer
+internal sealed class SapiKaraokePlayer : IControllablePlayback
 {
+    private readonly PlaybackController _controller;
+    private volatile SpeechSynthesizer? _synth;
+
+    public SapiKaraokePlayer(PlaybackController controller) => _controller = controller;
+
+    public void Pause() { try { _synth?.Pause(); } catch { } }
+    public void Resume() { try { _synth?.Resume(); } catch { } }
+
     public bool Play(string text, TtsConfig cfg, CancellationToken ct)
     {
         // Tokenise into words + their character offsets (SpeakProgress reports the
@@ -33,10 +41,12 @@ internal sealed class SapiKaraokePlayer
             win = new KaraokeWindow();
             win.SetWords(words);
             win.Configure(cfg.Karaoke.FontSize, cfg.Karaoke.Position);
+            win.SetController(_controller);
             win.Show();
         });
 
         var synth = new SpeechSynthesizer();
+        _synth = synth;
         var done = new ManualResetEventSlim(false);
         try
         {
@@ -57,6 +67,7 @@ internal sealed class SapiKaraokePlayer
         catch { return false; }
         finally
         {
+            _synth = null;
             synth.Dispose();
             Dispatcher.UIThread.Invoke(() => win?.Close());
         }

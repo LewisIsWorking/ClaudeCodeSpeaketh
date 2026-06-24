@@ -1,15 +1,45 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:s="using:ClaudeCodeSpeaketh.Services"
         x:Class="ClaudeCodeSpeaketh.Views.KaraokeWindow"
+        x:DataType="s:PlaybackController"
         Topmost="True" ShowInTaskbar="False" WindowDecorations="None"
-        Background="Transparent" CanResize="False"
-        SizeToContent="WidthAndHeight"
+        Background="Transparent" CanResize="True"
+        Width="880" Height="240" MinWidth="360" MinHeight="150"
         WindowStartupLocation="CenterScreen">
 
-    <Border Background="#E6101014" CornerRadius="14" Padding="26,20"
+    <Border Background="#E6101014" CornerRadius="14"
             BorderBrush="#33363d" BorderThickness="1">
-        <TextBlock Name="WordsBlock" MaxWidth="860"
-                   FontSize="26" LineHeight="42" TextWrapping="Wrap"
-                   Foreground="#9aa0a6" />
+        <Grid RowDefinitions="*,Auto">
+
+            <!-- The response text (drag the window by pressing here). Scrolls when
+                 the response is taller than the window. -->
+            <ScrollViewer Name="WordsScroll" Grid.Row="0" Padding="26,18,26,4"
+                          VerticalScrollBarVisibility="Auto">
+                <TextBlock Name="WordsBlock" FontSize="26" LineHeight="42"
+                           TextWrapping="Wrap" Foreground="#9aa0a6" />
+            </ScrollViewer>
+
+            <!-- Transport + resize grip -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="10,0,4,4">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6"
+                            HorizontalAlignment="Center">
+                    <Button Content="⏮" Command="{Binding BackCommand}"
+                            IsEnabled="{Binding CanGoBack}" Width="42"
+                            ToolTip.Tip="Replay the previous response" />
+                    <Button Content="{Binding PauseResumeLabel}"
+                            Command="{Binding PauseResumeCommand}"
+                            IsEnabled="{Binding CanPause}" Width="104" />
+                    <Button Content="⏭" Command="{Binding SkipCommand}"
+                            IsEnabled="{Binding IsSpeaking}" Width="42"
+                            ToolTip.Tip="Skip the current response" />
+                </StackPanel>
+
+                <!-- Drag this corner to resize the overlay. -->
+                <Path Name="ResizeGrip" Grid.Column="1" Width="16" Height="16"
+                      Margin="6,0,2,0" Fill="#66FFFFFF" Cursor="BottomRightCorner"
+                      Data="M16,4 L16,16 L4,16 Z" VerticalAlignment="Bottom" />
+            </Grid>
+        </Grid>
     </Border>
 </Window>

@@ -17,12 +17,22 @@ namespace ClaudeCodeSpeaketh.Services;
 // edge engine + karaoke: synthesizes to mp3 + per-word timings (edge-karaoke.py),
 // shows the companion window, plays the mp3 in-process (NAudio) and highlights the
 // current word. Blocks until done/cancelled. Returns false to fall back to SAPI.
-internal sealed class EdgeKaraokePlayer
+internal sealed class EdgeKaraokePlayer : IControllablePlayback
 {
     private record Word(long Offset, long Duration, string Text);
 
     private readonly string _hooksDir;
-    public EdgeKaraokePlayer(string hooksDir) => _hooksDir = hooksDir;
+    private readonly PlaybackController _controller;
+    private volatile WaveOutEvent? _output;
+
+    public EdgeKaraokePlayer(string hooksDir, PlaybackController controller)
+    {
+        _hooksDir = hooksDir;
+        _controller = controller;
+    }
+
+    public void Pause() => _output?.Pause();
+    public void Resume() => _output?.Play();
 
     // Records why karaoke synthesis failed (e.g. no python/internet) for diagnosis.
     private void LogError(string msg)
@@ -48,6 +58,7 @@ internal sealed class EdgeKaraokePlayer
             win = new KaraokeWindow();
             win.SetWords(words.Select(w => w.Text).ToList());
             win.Configure(cfg.Karaoke.FontSize, cfg.Karaoke.Position);
+            win.SetController(_controller);
             win.Show();
         });
 
@@ -103,21 +114,34 @@ internal sealed class EdgeKaraokePlayer
         catch { return new(); }
     }
 
-    private static void PlayAndHighlight(string mp3, List<Word> words, Color color, KaraokeWindow win, float volume, CancellationToken ct)
+    private void PlayAndHighlight(string mp3, List<Word> words, Color color, KaraokeWindow win, float volume, CancellationToken ct)
     {
         using var reader = new MediaFoundationReader(mp3);
         using var output = new WaveOutEvent { Volume = volume };
+        using var stopped = new ManualResetEventSlim(false);
+        output.PlaybackStopped += (_, _) => stopped.Set();
         output.Init(reader);
-        output.Play();
-
-        while (output.PlaybackState == PlaybackState.Playing)
+        _output = output;
+        try
         {
-            if (ct.IsCancellationRequested) { output.Stop(); break; }
-            var pos = reader.CurrentTime.TotalMilliseconds;
-            var idx = IndexForPosition(words, pos);
-            if (idx >= 0) Dispatcher.UIThread.Post(() => win.Highlight(idx, color));
-            Thread.Sleep(40);
+            output.Play();
+            // Loop until playback ends (natural or Stop). We must NOT exit merely
+            // because state != Playing -- a Pause sets state to Paused, and exiting
+            // here would tear the window down mid-utterance. Only advance the
+            // highlight while actually playing; keep polling while paused.
+            while (!stopped.IsSet)
+            {
+                if (ct.IsCancellationRequested) { output.Stop(); break; }
+                if (output.PlaybackState == PlaybackState.Playing)
+                {
+                    var pos = reader.CurrentTime.TotalMilliseconds;
+                    var idx = IndexForPosition(words, pos);
+                    if (idx >= 0) Dispatcher.UIThread.Post(() => win.Highlight(idx, color));
+                }
+                Thread.Sleep(40);
+            }
         }
+        finally { _output = null; }
     }
 
     // Last word whose start offset has been reached.

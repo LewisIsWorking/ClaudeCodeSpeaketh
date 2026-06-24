@@ -288,12 +288,26 @@
 
         </TabControl>
 
-        <!-- Footer: save + status -->
-        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="12">
-            <TextBlock Grid.Column="0" Text="{Binding Status}"
+        <!-- Footer: transport + status + save -->
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+            <!-- Playback transport: live controls for the current spoken response -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6"
+                        VerticalAlignment="Center">
+                <Button Content="⏮ Back" Command="{Binding Playback.BackCommand}"
+                        IsEnabled="{Binding Playback.CanGoBack}" Padding="10,6"
+                        ToolTip.Tip="Replay the previous response" />
+                <Button Content="{Binding Playback.PauseResumeLabel}"
+                        Command="{Binding Playback.PauseResumeCommand}"
+                        IsEnabled="{Binding Playback.CanPause}" Padding="10,6" Width="104"
+                        ToolTip.Tip="Pause or resume the current response" />
+                <Button Content="⏭ Skip" Command="{Binding Playback.SkipCommand}"
+                        IsEnabled="{Binding Playback.IsSpeaking}" Padding="10,6"
+                        ToolTip.Tip="Stop the current response" />
+            </StackPanel>
+            <TextBlock Grid.Column="1" Text="{Binding Status}"
                        VerticalAlignment="Center" TextWrapping="Wrap"
                        FontSize="12" Opacity="0.75" />
-            <Button Grid.Column="1" Content="Save"
+            <Button Grid.Column="2" Content="Save"
                     Command="{Binding SaveCommand}"
                     Background="#5d63ff" Foreground="White" Padding="20,8" />
         </Grid>
