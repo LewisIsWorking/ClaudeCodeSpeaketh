@@ -2,6 +2,13 @@
 
 All notable changes to ClaudeCodeSpeaketh. Newest first.
 
+## 0.16.0
+- Cleaner speech: box-drawing tables (┌─┬┐ │ └─┴┘) are now skipped entirely instead
+  of being read as a jumble of cell text.
+- Pronunciation fixes: "~10" is read as "about 10", "PF2e"/"SF2e" as
+  "Pathfinder"/"Starfinder", plus TTRPG, AoN, e.g., i.e. and vs. More can be added
+  easily in speak-response.ps1.
+
 ## 0.15.0
 - Playback transport: Back / Pause-Resume / Skip controls on both the main window
   (footer) and the karaoke overlay. Back replays the previous response, Pause/Resume

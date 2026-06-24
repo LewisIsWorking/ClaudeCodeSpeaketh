@@ -40,6 +40,15 @@ try {
     }
     if (-not $text) { exit 0 }
 
+    # --- drop box-drawing tables (we never want them read aloud) --------------
+    # Every row/border line of a Unicode box table contains a box-drawing char
+    # (U+2500-U+257F: the - | + corners). Remove whole lines that have one. This
+    # MUST run before the non-ASCII strip below, while those chars still exist.
+    # Build the box-drawing range (U+2500..U+257F) from char codes so this script
+    # stays pure ASCII (a literal non-ASCII regex range silently breaks on PS 5.1).
+    $boxRange = '[' + [char]0x2500 + '-' + [char]0x257F + ']'
+    $text = (($text -split "`n") | Where-Object { $_ -notmatch $boxRange }) -join "`n"
+
     # --- strip markdown / code so the voice speaks prose, not punctuation -----
     if ($cfg.StripMarkdown) {
         $text = [regex]::Replace($text, '(?s)```.*?```', ' ')          # fenced code
@@ -49,6 +58,18 @@ try {
         $text = [regex]::Replace($text, '(?m)^\s*[-+]\s+', ' ')        # list bullets
         $text = [regex]::Replace($text, '[^\x09\x0A\x0D\x20-\x7E]', ' ') # non-ASCII
     }
+    # --- pronunciation fixes: make symbols/abbreviations speak naturally ------
+    # Add more pairs below as you find them. Patterns are .NET regex; (?i) = case-
+    # insensitive, \b = word boundary. Applied to the cleaned prose.
+    $text = [regex]::Replace($text, '~(?=\s*\d)', 'about ')      # ~10 min -> about 10 min
+    $text = [regex]::Replace($text, '(?i)\bPF2e\b',  'Pathfinder')
+    $text = [regex]::Replace($text, '(?i)\bSF2e\b',  'Starfinder')
+    $text = [regex]::Replace($text, '(?i)\bTTRPG\b', 'tabletop RPG')
+    $text = [regex]::Replace($text, '\bAoN\b',       'Archives of Nethys')
+    $text = [regex]::Replace($text, '(?i)\be\.g\.',  'for example')
+    $text = [regex]::Replace($text, '(?i)\bi\.e\.',  'that is')
+    $text = [regex]::Replace($text, '(?i)\bvs\b\.?', 'versus')
+
     $text = [regex]::Replace($text, '\s+', ' ').Trim()
     if (-not $text) { exit 0 }
 
