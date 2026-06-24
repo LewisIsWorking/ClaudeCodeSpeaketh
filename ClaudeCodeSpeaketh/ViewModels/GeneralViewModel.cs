@@ -17,6 +17,9 @@ internal partial class GeneralViewModel : ObservableObject
     // whenever the box is toggled.
     [ObservableProperty] private bool _startAtStartup;
 
+    // How it launches at sign-in: 0 = hidden in the tray, 1 = window open.
+    [ObservableProperty] private int _startupModeIndex;
+
     // Engine: true = Neural (edge-tts), false = Classic (SAPI). Neural is default.
     [ObservableProperty] private bool _useNeural = true;
 
@@ -34,13 +37,17 @@ internal partial class GeneralViewModel : ObservableObject
     public GeneralViewModel(IStartupService startup)
     {
         _startup = startup;
-        // Set the backing field directly: reflect the current registry state in
-        // the checkbox WITHOUT re-triggering a registry write on load.
+        // Set the backing fields directly: reflect the current registry state in
+        // the controls WITHOUT re-triggering a registry write on load.
         _startAtStartup = startup.IsEnabled();
+        _startupModeIndex = startup.IsTrayMode() ? 0 : 1;
     }
 
-    // Toggling the box adds/removes the Run-key registration immediately.
-    partial void OnStartAtStartupChanged(bool value) => _startup.SetEnabled(value);
+    // Toggling the box or changing the mode rewrites the Run-key registration.
+    partial void OnStartAtStartupChanged(bool value) => ApplyStartup();
+    partial void OnStartupModeIndexChanged(int value) => ApplyStartup();
+
+    private void ApplyStartup() => _startup.SetEnabled(StartAtStartup, startInTray: StartupModeIndex == 0);
 
     public void LoadFrom(TtsConfig cfg)
     {

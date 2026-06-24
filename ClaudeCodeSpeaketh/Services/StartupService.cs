@@ -21,7 +21,16 @@ internal sealed class StartupService : IStartupService
         return key?.GetValue(ValueName) is string;
     }
 
-    public void SetEnabled(bool enabled)
+    public bool IsTrayMode()
+    {
+        using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: false);
+        // Tray mode == the stored command carries --startup. Default to tray.
+        return key?.GetValue(ValueName) is string v
+            ? v.Contains(StartupArg, StringComparison.OrdinalIgnoreCase)
+            : true;
+    }
+
+    public void SetEnabled(bool enabled, bool startInTray)
     {
         using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: true)
                         ?? Registry.CurrentUser.CreateSubKey(RunKey);
@@ -33,7 +42,8 @@ internal sealed class StartupService : IStartupService
             // 'current' path once installed); quote it for spaces in the path.
             var exe = Environment.ProcessPath;
             if (string.IsNullOrEmpty(exe)) return;
-            key.SetValue(ValueName, $"\"{exe}\" {StartupArg}");
+            // --startup => App starts hidden in tray; without it => window opens.
+            key.SetValue(ValueName, startInTray ? $"\"{exe}\" {StartupArg}" : $"\"{exe}\"");
         }
         else
         {

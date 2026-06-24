@@ -7,6 +7,12 @@ internal interface IStartupService
     /// <summary>True if the app is currently registered to launch at sign-in.</summary>
     bool IsEnabled();
 
-    /// <summary>Add (or remove) the launch-at-sign-in registration.</summary>
-    void SetEnabled(bool enabled);
+    /// <summary>True if the stored launch starts hidden in the tray (vs. window).</summary>
+    bool IsTrayMode();
+
+    /// <summary>
+    /// Add (or remove) the launch-at-sign-in registration. When enabled,
+    /// <paramref name="startInTray"/> chooses hidden-in-tray vs. window-open.
+    /// </summary>
+    void SetEnabled(bool enabled, bool startInTray);
 }
