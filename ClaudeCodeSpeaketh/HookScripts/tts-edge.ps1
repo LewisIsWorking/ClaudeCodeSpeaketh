@@ -8,8 +8,9 @@
 param(
     [string]$TextFile,
     [string]$Text,
-    [string]$Voice = 'en-IE-EmilyNeural',
-    [string]$Rate  = '+0%'
+    [string]$Voice  = 'en-IE-EmilyNeural',
+    [string]$Rate   = '+0%',
+    [int]$Volume     = 100
 )
 
 # Resolve a python that actually has edge_tts, skipping the Microsoft Store stub
@@ -25,7 +26,7 @@ function Get-Python {
 }
 
 function Invoke-EdgeSpeak {
-    param([string]$TextFile, [string]$Text, [string]$Voice, [string]$Rate)
+    param([string]$TextFile, [string]$Text, [string]$Voice, [string]$Rate, [int]$Volume = 100)
 
     $mp3 = Join-Path $env:TEMP ("ccs-edge-" + $PID + ".mp3")
     if (Test-Path -LiteralPath $mp3) { Remove-Item -LiteralPath $mp3 -Force -ErrorAction SilentlyContinue }
@@ -45,6 +46,8 @@ function Invoke-EdgeSpeak {
     try {
         Add-Type -AssemblyName presentationCore
         $player = New-Object System.Windows.Media.MediaPlayer
+        # MediaPlayer.Volume is 0.0..1.0 (and defaults to 0.5!). Map the 0..100 slider.
+        $player.Volume = [math]::Max(0.0, [math]::Min(1.0, $Volume / 100.0))
         $player.Open([Uri]::new($mp3))
         $n = 0
         while (-not $player.NaturalDuration.HasTimeSpan -and $n -lt 60) { Start-Sleep -Milliseconds 50; $n++ }
@@ -59,6 +62,6 @@ function Invoke-EdgeSpeak {
 
 # Standalone invocation (preview): run if any text source was passed as a param.
 if ($Text -or $TextFile) {
-    $ok = Invoke-EdgeSpeak -TextFile $TextFile -Text $Text -Voice $Voice -Rate $Rate
+    $ok = Invoke-EdgeSpeak -TextFile $TextFile -Text $Text -Voice $Voice -Rate $Rate -Volume $Volume
     if (-not $ok) { exit 1 }
 }

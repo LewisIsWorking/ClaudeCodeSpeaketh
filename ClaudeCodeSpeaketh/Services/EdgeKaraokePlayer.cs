@@ -51,7 +51,8 @@ internal sealed class EdgeKaraokePlayer
             win.Show();
         });
 
-        try { PlayAndHighlight(mp3, words, color, win!, ct); }
+        var volume = System.Math.Clamp(cfg.Sapi.Volume / 100f, 0f, 1f);
+        try { PlayAndHighlight(mp3, words, color, win!, volume, ct); }
         catch { return false; }
         finally { Dispatcher.UIThread.Invoke(() => win?.Close()); }
         return true;
@@ -102,10 +103,10 @@ internal sealed class EdgeKaraokePlayer
         catch { return new(); }
     }
 
-    private static void PlayAndHighlight(string mp3, List<Word> words, Color color, KaraokeWindow win, CancellationToken ct)
+    private static void PlayAndHighlight(string mp3, List<Word> words, Color color, KaraokeWindow win, float volume, CancellationToken ct)
     {
         using var reader = new MediaFoundationReader(mp3);
-        using var output = new WaveOutEvent();
+        using var output = new WaveOutEvent { Volume = volume };
         output.Init(reader);
         output.Play();
 

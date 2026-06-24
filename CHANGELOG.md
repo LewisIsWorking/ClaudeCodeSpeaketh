@@ -2,6 +2,14 @@
 
 All notable changes to ClaudeCodeSpeaketh. Newest first.
 
+## 0.14.0
+- Volume now works on the neural (edge) engine, not just Classic/SAPI. The slider
+  was previously ignored for the default voice; it now sets the playback volume on
+  both the plain and karaoke neural paths. As with every setting, it applies live
+  on the next response — no Save click needed.
+- Startup launch mode: choose whether sign-in launch opens hidden in the tray or
+  with the window showing (a combo box next to the Startup tick box).
+
 ## 0.13.0
 - Start at Windows sign-in: a "Startup" tick box on the General tab. When on,
   the app launches hidden in the tray at logon so the speech daemon is always

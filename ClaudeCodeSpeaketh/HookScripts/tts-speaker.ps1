@@ -23,7 +23,7 @@ try {
     if ($cfg.Engine -eq 'edge' -and (Test-Path -LiteralPath $edgeScript)) {
         . $edgeScript   # dot-source with no args only defines Invoke-EdgeSpeak
         $rate = ('{0:+0;-0;+0}' -f ([int]$cfg.Rate * 10)) + '%'
-        if (Invoke-EdgeSpeak -TextFile $textFile -Voice $cfg.EdgeVoice -Rate $rate) { return }
+        if (Invoke-EdgeSpeak -TextFile $textFile -Voice $cfg.EdgeVoice -Rate $rate -Volume ([int]$cfg.Volume)) { return }
         # else fall through to SAPI
     }
 
