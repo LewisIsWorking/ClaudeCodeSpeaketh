@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ClaudeCodeSpeaketh.Models;
@@ -22,7 +23,7 @@ internal partial class SessionsViewModel : ObservableObject
     public ObservableCollection<SessionToggle> Sessions { get; } = new();
 
     [ObservableProperty] private string _hint =
-        "Recent Claude terminals (last 24h). Untick one to mute just that terminal. New ones appear as they speak.";
+        "Currently open Claude terminals (active in the last 15 min). Untick one to mute just that terminal.";
 
     public SessionsViewModel(Func<TtsConfig> load, Action<TtsConfig> save, SessionDiscoveryService discovery)
     {
@@ -30,23 +31,44 @@ internal partial class SessionsViewModel : ObservableObject
         _save = save;
         _discovery = discovery;
         Refresh();
+
+        // Keep the list current: re-scan periodically so closed/idle terminals
+        // drop off and newly-active ones appear without a manual Refresh.
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(30) };
+        timer.Tick += (_, _) => Refresh();
+        timer.Start();
     }
 
     [RelayCommand]
     private void Refresh()
     {
-        foreach (var d in _discovery.Discover())
+        var active = _discovery.Discover();
+        var activeIds = new HashSet<string>(active.Select(d => d.Id));
+
+        // Drop sessions that are no longer open/active (outside the window).
+        for (var i = Sessions.Count - 1; i >= 0; i--)
+            if (!activeIds.Contains(Sessions[i].Id)) Sessions.RemoveAt(i);
+
+        // Add new ones / refresh detail of existing ones.
+        foreach (var d in active)
             NoteSession(d.Id, d.Cwd, d.Branch, d.LastActiveUtc);
     }
 
-    // Called (on the UI thread) for discovered + live-heard sessions.
+    // Called (on the UI thread) for discovered + live-heard sessions. Upserts:
+    // adds a missing session, or refreshes an existing row's detail line.
     public void NoteSession(string id, string cwd, string branch = "", DateTime? lastActiveUtc = null)
     {
         if (string.IsNullOrWhiteSpace(id)) return;
-        if (Sessions.Any(s => s.Id == id)) return;
+        var detail = BuildDetail(cwd, branch, lastActiveUtc);
+        var existing = Sessions.FirstOrDefault(s => s.Id == id);
+        if (existing is not null)
+        {
+            existing.Detail = detail;
+            return;
+        }
         var cfg = _load();
         var enabled = !cfg.SessionOverrides.TryGetValue(id, out var on) || on;
-        Sessions.Add(new SessionToggle(id, BuildLabel(id, cwd), BuildDetail(cwd, branch, lastActiveUtc), enabled, Persist));
+        Sessions.Add(new SessionToggle(id, BuildLabel(id, cwd), detail, enabled, Persist));
     }
 
     // Prefer the terminal's project-folder name; fall back to a short id.

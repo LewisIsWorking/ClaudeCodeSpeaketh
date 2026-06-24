@@ -2,6 +2,11 @@
 
 All notable changes to ClaudeCodeSpeaketh. Newest first.
 
+## 0.17.0
+- Sessions tab now shows only currently-open terminals: it lists sessions active in
+  the last 15 minutes (was 24h) and auto-refreshes every 30s, so closed/idle terminals
+  drop off and active ones appear on their own. Muting still persists per terminal.
+
 ## 0.16.0
 - Cleaner speech: box-drawing tables (┌─┬┐ │ └─┴┘) are now skipped entirely instead
   of being read as a jumble of cell text.

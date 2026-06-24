@@ -22,11 +22,16 @@ internal sealed class SessionDiscoveryService
         _projectsDir = Path.Combine(claudeDir, "projects");
     }
 
-    /// <summary>Recent sessions (mtime within maxAgeHours), newest first, capped.</summary>
-    public IReadOnlyList<DiscoveredSession> Discover(int maxAgeHours = 24, int cap = 25)
+    /// <summary>
+    /// Sessions active within the last <paramref name="maxAgeMinutes"/> minutes
+    /// (newest first, capped). A short window approximates "currently open
+    /// terminals": Claude Code writes no close marker, so we treat a transcript
+    /// untouched for a while as a terminal that is closed or idle.
+    /// </summary>
+    public IReadOnlyList<DiscoveredSession> Discover(int maxAgeMinutes = 15, int cap = 25)
     {
         if (!Directory.Exists(_projectsDir)) return Array.Empty<DiscoveredSession>();
-        var cutoff = DateTime.UtcNow.AddHours(-maxAgeHours);
+        var cutoff = DateTime.UtcNow.AddMinutes(-maxAgeMinutes);
 
         IEnumerable<string> files;
         try { files = Directory.EnumerateFiles(_projectsDir, "*.jsonl", SearchOption.AllDirectories); }
