@@ -2,6 +2,12 @@
 
 All notable changes to ClaudeCodeSpeaketh. Newest first.
 
+## 0.20.0
+- Updating the app now refreshes the Claude Code hook scripts automatically. The
+  in-app updater redeploys them to ~/.claude/hooks the moment the new version is
+  applied (via Velopack's after-update callback), so speech fixes take effect on
+  Claude's next turn with no manual restart. (A startup redeploy stays as backup.)
+
 ## 0.19.0
 - Table skipping now covers every style, not just Unicode box-drawing grids:
   markdown pipe tables ("| a | b |", "|---|---|") and ASCII "+----+" tables are
