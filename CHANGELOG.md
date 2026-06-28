@@ -2,6 +2,13 @@
 
 All notable changes to ClaudeCodeSpeaketh. Newest first.
 
+## 0.19.0
+- Table skipping now covers every style, not just Unicode box-drawing grids:
+  markdown pipe tables ("| a | b |", "|---|---|") and ASCII "+----+" tables are
+  also dropped before speaking. Prose containing a stray "a | b" is unaffected.
+  (If a table was still being read, restart the app once so the updated hook
+  redeploys to ~/.claude/hooks.)
+
 ## 0.18.0
 - Pronunciation: "lich" is now read as "litch" (and "liches" as "litches"), so the
   undead spellcaster sounds right. Add more such fixes in speak-response.ps1.

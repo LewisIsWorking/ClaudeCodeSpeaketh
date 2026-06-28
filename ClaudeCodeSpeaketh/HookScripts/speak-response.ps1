@@ -40,14 +40,23 @@ try {
     }
     if (-not $text) { exit 0 }
 
-    # --- drop box-drawing tables (we never want them read aloud) --------------
-    # Every row/border line of a Unicode box table contains a box-drawing char
-    # (U+2500-U+257F: the - | + corners). Remove whole lines that have one. This
-    # MUST run before the non-ASCII strip below, while those chars still exist.
-    # Build the box-drawing range (U+2500..U+257F) from char codes so this script
-    # stays pure ASCII (a literal non-ASCII regex range silently breaks on PS 5.1).
+    # --- drop tables of every style (we never want them read aloud) -----------
+    # Whole-line removal of anything that looks like a table row or border:
+    #   * Unicode box-drawing: any char in U+2500-U+257F (the - | + corners).
+    #   * Markdown pipe rows:  leading AND trailing '|' (e.g. "| a | b |",
+    #     "|---|---|"). Anchoring to both pipes avoids dropping prose that just
+    #     happens to contain a single "a | b".
+    #   * ASCII borders:       lines of only + - = | and spaces ("+----+----+").
+    # This MUST run before the non-ASCII strip below, while box chars still exist.
+    # The box range is built from char codes so the script stays pure ASCII (a
+    # literal non-ASCII regex range silently breaks on Windows PowerShell 5.1).
     $boxRange = '[' + [char]0x2500 + '-' + [char]0x257F + ']'
-    $text = (($text -split "`n") | Where-Object { $_ -notmatch $boxRange }) -join "`n"
+    $text = (($text -split "`n") | Where-Object {
+        if ($_ -match $boxRange)                 { return $false }  # Unicode box table
+        if ($_ -match '^\s*\|.*\|\s*$')          { return $false }  # markdown pipe row
+        if ($_ -match '^\s*\+[-+=\s]*\+\s*$')    { return $false }  # ASCII +---+ border
+        return $true
+    }) -join "`n"
 
     # --- strip markdown / code so the voice speaks prose, not punctuation -----
     if ($cfg.StripMarkdown) {
