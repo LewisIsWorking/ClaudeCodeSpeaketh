@@ -69,6 +69,7 @@ try {
     $text = [regex]::Replace($text, '(?i)\be\.g\.',  'for example')
     $text = [regex]::Replace($text, '(?i)\bi\.e\.',  'that is')
     $text = [regex]::Replace($text, '(?i)\bvs\b\.?', 'versus')
+    $text = [regex]::Replace($text, '(?i)\blich(es)?\b', 'litch$1') # lich -> litch (and liches -> litches)
 
     $text = [regex]::Replace($text, '\s+', ' ').Trim()
     if (-not $text) { exit 0 }

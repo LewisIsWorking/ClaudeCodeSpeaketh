@@ -2,6 +2,10 @@
 
 All notable changes to ClaudeCodeSpeaketh. Newest first.
 
+## 0.18.0
+- Pronunciation: "lich" is now read as "litch" (and "liches" as "litches"), so the
+  undead spellcaster sounds right. Add more such fixes in speak-response.ps1.
+
 ## 0.17.0
 - Sessions tab now shows only currently-open terminals: it lists sessions active in
   the last 15 minutes (was 24h) and auto-refreshes every 30s, so closed/idle terminals
