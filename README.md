@@ -1,5 +1,20 @@
 # ClaudeCodeSpeaketh 🗣️
 
+## Open Source Maintenance Fee
+
+This project requires an [Open Source Maintenance Fee](https://opensourcemaintenancefee.org/) from
+organisations that use the **official binary release** as part of revenue-generating activity and
+have annual gross revenue of **US$10,000 or more**.
+
+- The **source stays free** under this repository's LICENSE. The fee is not a licence fee.
+- **Self-compiled binaries are exempt.** You may always build from source under the LICENSE.
+- Organisations under US$10,000 annual gross revenue are **exempt**.
+- Individuals, hobbyists and personal use are **exempt**.
+- Issues, discussions and pull requests stay **open to everyone**, fee or not.
+
+Pay the fee via [GitHub Sponsors](https://github.com/sponsors/LewisIsWorking) at the
+**Maintenance Fee** tier. Full terms: [OSMFEULA.txt](OSMFEULA.txt).
+
 A small Avalonia desktop app to configure **Claude Code's text-to-speech** — the
 feature that reads Claude's responses aloud on Windows via a Claude Code `Stop` hook.
 
