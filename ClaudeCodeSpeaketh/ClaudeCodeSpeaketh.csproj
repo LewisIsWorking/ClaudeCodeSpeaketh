@@ -13,6 +13,7 @@
              (Window.Icon only covers the title bar / alt-tab). -->
         <ApplicationIcon>Assets\app.ico</ApplicationIcon>
         <Version>0.1.0</Version>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup>
