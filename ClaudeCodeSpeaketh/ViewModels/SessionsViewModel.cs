@@ -75,8 +75,7 @@ internal partial class SessionsViewModel : ObservableObject
     private static string BuildLabel(string id, string cwd)
     {
         var shortId = id.Length > 8 ? id.Substring(0, 8) : id;
-        var leaf = string.IsNullOrWhiteSpace(cwd)
-            ? "" : Path.GetFileName(cwd.TrimEnd('\\', '/'));
+        var leaf = SessionLabel.Leaf(cwd);
         return leaf.Length > 0 ? $"{leaf}   ({shortId})" : shortId;
     }
 

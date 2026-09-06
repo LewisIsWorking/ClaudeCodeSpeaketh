@@ -116,17 +116,18 @@ internal sealed class SpeechQueueProcessor : IDisposable
             {
                 // Karaoke window (edge or SAPI) when enabled; otherwise -- or if
                 // karaoke synthesis fails -- fall back to plain speak.
+                var spoken = BuildSpokenText(item, cfg);
                 var handled = false;
                 if (controllable is not null)
                 {
                     handled = cfg.Engine == "edge"
-                        ? _karaoke.Play(item.Text, cfg, cts.Token)
-                        : _sapiKaraoke.Play(item.Text, cfg, cts.Token);
+                        ? _karaoke.Play(spoken, cfg, cts.Token)
+                        : _sapiKaraoke.Play(spoken, cfg, cts.Token);
                 }
                 if (!handled)
                 {
                     _controller.SetCanPause(false);   // plain path can't pause
-                    _runner.Speak(item.Text, cts.Token);
+                    _runner.Speak(spoken, cts.Token);
                 }
             }
             catch { }
@@ -136,6 +137,20 @@ internal sealed class SpeechQueueProcessor : IDisposable
                 _currentSession = null; _currentCts.Dispose(); _currentCts = null;
             }
         }
+    }
+
+    // Prefix the utterance with the terminal it came from, so several Claude
+    // sessions sharing one set of speakers stay tellable apart.
+    //
+    // Done here rather than in the Stop hook, and applied to a copy rather than to
+    // item.Text, for two reasons: the label then comes from the same source as the
+    // Sessions tab, and _history keeps the bare text -- so Back replays through
+    // this same path and re-labels once instead of compounding the prefix.
+    private static string BuildSpokenText(QueueItem item, TtsConfig cfg)
+    {
+        if (!cfg.SpeakSessionName) return item.Text;
+        var label = SessionLabel.ForSpeech(item.Cwd, item.SessionId);
+        return label.Length == 0 ? item.Text : $"{label}. {item.Text}";
     }
 
     // Within each session, keep only the newest queued file; delete the rest.

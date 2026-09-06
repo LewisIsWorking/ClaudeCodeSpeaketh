@@ -26,6 +26,13 @@ internal sealed class TtsConfig
     /// <summary>Queue across different Claude sessions (vs. only the latest).</summary>
     public bool QueueAcrossSessions { get; set; } = true;
 
+    /// <summary>
+    /// Announce which terminal an utterance came from by speaking the session's
+    /// project-folder name before the response. Useful when several Claude
+    /// sessions share one set of speakers.
+    /// </summary>
+    public bool SpeakSessionName { get; set; } = true;
+
     /// <summary>Per-session mute: sessionId -> enabled. Absent = enabled.</summary>
     public Dictionary<string, bool> SessionOverrides { get; set; } = new();
 
