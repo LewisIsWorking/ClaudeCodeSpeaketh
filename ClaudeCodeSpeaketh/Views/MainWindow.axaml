@@ -64,6 +64,15 @@
                     </StackPanel>
 
                     <StackPanel Spacing="6">
+                        <TextBlock Text="Which terminal is speaking" FontWeight="SemiBold" />
+                        <CheckBox IsChecked="{Binding General.SpeakSessionName}"
+                                  Content="Say the session name before each response" />
+                        <TextBlock Text="Reads the project-folder name of the terminal the response came from, e.g. &quot;ComeOnOverUno. Tests are passing.&quot;"
+                                   Opacity="0.7" TextWrapping="Wrap" MaxWidth="420"
+                                   HorizontalAlignment="Left" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="6">
                         <TextBlock Text="Rate (slower … faster)" FontWeight="SemiBold" />
                         <Slider Value="{Binding General.Rate}" Minimum="-10" Maximum="10"
                                 TickFrequency="1" IsSnapToTickEnabled="True" Width="360"

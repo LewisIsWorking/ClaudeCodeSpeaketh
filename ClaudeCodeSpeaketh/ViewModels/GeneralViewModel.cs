@@ -29,6 +29,9 @@ internal partial class GeneralViewModel : ObservableObject
     private bool _speakEntireResponse = true;
 
     [ObservableProperty] private int _maxCharsValue = 1500;
+
+    // Say which terminal an utterance came from before reading it.
+    [ObservableProperty] private bool _speakSessionName = true;
     [ObservableProperty] private int _rate;        // -10..10
     [ObservableProperty] private int _volume = 100; // 0..100
 
@@ -55,6 +58,7 @@ internal partial class GeneralViewModel : ObservableObject
         UseNeural = cfg.Engine != "sapi";
         SpeakEntireResponse = cfg.MaxChars <= 0;
         MaxCharsValue = cfg.MaxChars > 0 ? cfg.MaxChars : 1500;
+        SpeakSessionName = cfg.SpeakSessionName;
         Rate = cfg.Sapi.Rate;
         Volume = cfg.Sapi.Volume;
     }
@@ -64,6 +68,7 @@ internal partial class GeneralViewModel : ObservableObject
         cfg.Enabled = Enabled;
         cfg.Engine = UseNeural ? "edge" : "sapi";
         cfg.MaxChars = SpeakEntireResponse ? 0 : MaxCharsValue;
+        cfg.SpeakSessionName = SpeakSessionName;
         cfg.Sapi.Rate = Rate;
         cfg.Sapi.Volume = Volume;
     }

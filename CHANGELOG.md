@@ -2,6 +2,17 @@
 
 All notable changes to ClaudeCodeSpeaketh. Newest first.
 
+## 0.21.0
+- Each spoken response now starts with the name of the terminal it came from, so
+  several Claude sessions sharing one set of speakers stay tellable apart -- e.g.
+  "ComeOnOverUno. Tests are passing." The name is the session's project-folder
+  name, the same label the Sessions tab shows, falling back to a short session id
+  when the working directory is unknown. Toggle it under General -> "Which
+  terminal is speaking"; on by default.
+  (Claude Code does not expose the real terminal tab title to a hook, so the
+  project folder is the closest available stand-in -- it is what a tab is
+  normally named after anyway.)
+
 ## 0.20.0
 - Updating the app now refreshes the Claude Code hook scripts automatically. The
   in-app updater redeploys them to ~/.claude/hooks the moment the new version is
