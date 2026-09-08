@@ -1,0 +1,55 @@
+# CI for ClaudeCodeSpeaketh. There was none before this.
+#
+# Runs on windows-latest because the app targets net10.0-windows: it uses
+# System.Speech and the Windows speech registry, so it cannot build or test on
+# a Linux runner.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build-and-test:
+    name: Build, Test & Coverage
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore ClaudeCodeSpeaketh.slnx
+
+      - name: Build
+        run: dotnet build ClaudeCodeSpeaketh.slnx --no-restore --configuration Release
+
+      # coverage.runsettings strips compiler-generated code (the GeneratedRegex
+      # source generator's output, Avalonia XamlClosure types) before counting.
+      - name: Test with coverage
+        run: >
+          dotnet test ClaudeCodeSpeaketh.Tests/ClaudeCodeSpeaketh.Tests.csproj
+          --no-build --configuration Release
+          --collect:"XPlat Code Coverage"
+          --settings coverage.runsettings
+          --results-directory TestResults
+
+      # Enforces the 100%-coverage policy as a ratchet: fails if line or branch
+      # coverage drops below the floor in coverage-policy.json.
+      - name: Coverage gate
+        shell: pwsh
+        run: ./scripts/coverage-gate.ps1
+
+      - name: Upload coverage report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: TestResults/**/coverage.cobertura.xml

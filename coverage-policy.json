@@ -1,0 +1,24 @@
+{
+  "_comment": [
+    "Repository coverage policy: 100% line and branch, no exclusions.",
+    "'floor' is the enforced ratchet - CI fails below it. Raise it as tests land;",
+    "never lower it. 'target' is the policy itself and does not move.",
+    "",
+    "Baseline recorded 2026-09-08, the first measurement of this repo: there was",
+    "no test project and no CI at all before. 14 tests now cover SessionLabel,",
+    "the only fully pure module in the app.",
+    "",
+    "coverage.runsettings strips compiler-generated code before counting - the",
+    "GeneratedRegex source generator output and Avalonia XamlClosure types. That",
+    "is not a policy exclusion, it is code nobody wrote; leaving it in inflated",
+    "the denominator by 28 classes and put 100% out of reach by construction.",
+    "",
+    "The honest reading of this baseline: the app is almost entirely untested,",
+    "and most of what remains is Avalonia views, System.Speech interop and the",
+    "Velopack updater - the parts that need real seams before they can be tested",
+    "at all, not just more test methods."
+  ],
+  "floor":  { "line": 0.7, "branch": 2.4 },
+  "target": { "line": 100.0, "branch": 100.0 },
+  "slackWarning": 3.0
+}

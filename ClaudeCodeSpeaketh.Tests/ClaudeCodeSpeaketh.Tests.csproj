@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!-- Must match the app's TFM: it is net10.0-windows (System.Speech and
+             the Windows speech registry are Windows-only), and a plain net10.0
+             test project cannot reference it. -->
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+        <!-- coverlet reports line AND branch coverage, which the 100% policy needs. -->
+        <PackageReference Include="coverlet.collector" Version="6.0.4" />
+        <PackageReference Include="coverlet.msbuild" Version="6.0.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ClaudeCodeSpeaketh\ClaudeCodeSpeaketh.csproj" />
+    </ItemGroup>
+
+</Project>
