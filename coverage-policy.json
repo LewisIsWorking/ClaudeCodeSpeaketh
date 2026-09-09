@@ -4,6 +4,11 @@
     "'floor' is the enforced ratchet - CI fails below it. Raise it as tests land;",
     "never lower it. 'target' is the policy itself and does not move.",
     "",
+    "FLOORS ARE RELEASE NUMBERS. Measure with --configuration Release, which is",
+    "what CI builds. Debug is not comparable: on one commit Debug counted 1,169",
+    "lines to Release 965, a 21% larger denominator from identical source. A",
+    "floor raised from a Debug run reds the build on CI.",
+    "",
     "Baseline recorded 2026-09-08: no test project and no CI existed before it.",
     "Raised 2026-09-09 when GeneralViewModel gained tests: 28 tests now cover",
     "SessionLabel and GeneralViewModel, the two classes at 100%.",
@@ -15,12 +20,12 @@
     "",
     "The honest reading: the app is still almost entirely untested. What remains",
     "is Avalonia views, System.Speech interop and the Velopack updater - parts",
-    "that need real seams before they can be tested at all, not just more test",
-    "methods. The pure view models are the reachable next step."
+    "that need real seams before they can be tested at all. The pure view models",
+    "are the reachable next step."
   ],
   "floor": {
-    "line": 3.4,
-    "branch": 4.3
+    "line": 3.6,
+    "branch": 3.9
   },
   "target": {
     "line": 100,

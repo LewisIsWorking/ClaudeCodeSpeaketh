@@ -9,7 +9,16 @@
     tests land; never lower them.
 
     Reads the cobertura report produced by:
-        dotnet test --collect:"XPlat Code Coverage" --settings coverage.runsettings
+        dotnet test --configuration Release --collect:"XPlat Code Coverage" --settings coverage.runsettings
+
+    ALWAYS MEASURE IN RELEASE. CI builds Release, so the floors are Release
+    numbers, and Debug is not comparable: measured 2026-09-09 on one commit,
+    Debug counted 1,169 lines and 412 branches where Release counted 965 and
+    406 -- a 21% larger denominator from identical source, because the two
+    configurations emit different sequence points. A floor raised from a Debug
+    run is systematically too high and reds the build on CI, which is exactly
+    how this note came to be written. The cobertura report records no
+    configuration, so this cannot be detected here, only stated.
 
     coverage.runsettings strips compiler-generated code before it is counted --
     the GeneratedRegex source generator's output and Avalonia's XamlClosure
