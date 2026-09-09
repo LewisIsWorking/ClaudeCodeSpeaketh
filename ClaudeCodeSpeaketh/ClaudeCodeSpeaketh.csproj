@@ -52,4 +52,10 @@
         <PackageReference Include="NAudio" Version="2.2.1" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- Every service and view-model in this app is `internal`; the test
+             project needs access to measure or exercise any of it. -->
+        <InternalsVisibleTo Include="ClaudeCodeSpeaketh.Tests" />
+    </ItemGroup>
+
 </Project>

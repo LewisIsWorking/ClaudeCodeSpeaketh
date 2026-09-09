@@ -20,3 +20,7 @@ art/*.png
 # OS cruft
 Thumbs.db
 .DS_Store
+TestResults/
+coverage/
+[Bb]in/
+[Oo]bj/
